@@ -1,16 +1,20 @@
 using CxxWrap
 
+z3dir = joinpath(pwd(), "z3")
+z3builddir = joinpath(z3dir, "build")
+srcdir = joinpath(pwd(), "src")
+
 try
-    # run(`git clone --branch z3-4.8.6 https://github.com/Z3Prover/z3.git`)
+    run(`git clone --branch z3-4.8.6 https://github.com/Z3Prover/z3.git`)
 catch
 end
-cd("z3")
-# run(`python scripts/mk_make.py`)
-cd("build")
-# run(`make`)
+mkdir(z3builddir)
+cd(z3builddir)
+run(`cmake $z3dir`)
+run(`make`)
 
 JlCxx_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
-Z3_dir = joinpath(dirname(pwd()), "build")
 
-cd("../../src")
-run(`cmake -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$Z3_dir`)
+cd(srcdir)
+run(`cmake -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3builddir`)
+run(`make`)
