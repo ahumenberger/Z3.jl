@@ -8,7 +8,9 @@ try
     run(`git clone --branch z3-4.8.6 https://github.com/Z3Prover/z3.git`)
 catch
 end
-mkdir(z3builddir)
+if !isdir(z3builddir)
+    mkdir(z3builddir)
+end
 cd(z3builddir)
 run(`cmake $z3dir`)
 run(`make`)
