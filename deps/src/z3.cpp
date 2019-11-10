@@ -67,5 +67,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<model>("Model")
         .method("num_consts", &model::num_consts)
         .method("get_const_decl", &model::get_const_decl)
+        .method("getindex", [](const model& m, int i){return m[i];})
         STRING(model const &);
+
+    mod.add_type<func_decl>("FuncDecl")
+        .method("arity", &func_decl::arity)
+        .method("domain", &func_decl::domain)
+        .method("range", &func_decl::range)
+        .method("name", &func_decl::name)
+        .method("is_const", &func_decl::is_const);
+        // .method(&func_decl::operator());
 }
