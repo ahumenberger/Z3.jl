@@ -3,7 +3,7 @@ module Z3
 import Libdl
 using CxxWrap
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >
-import Base: string
+import Base: string, getindex
 
 @wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
 
@@ -33,6 +33,16 @@ for name in names(Z3, all=true, imported=false)
     if __should_be_exported(name)
         @eval export $name 
     end
+end
+
+types_show = [
+    Expr,
+    Solver,
+    Model
+]
+
+for T in types_show
+    Base.show(io::IO, x::T) = print(io, string(x))
 end
 
 end # module
