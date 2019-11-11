@@ -23,15 +23,24 @@ using namespace jlcxx;
 
 template<> struct IsBits<check_result> : std::true_type {};
 
+#define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
+
 JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 {
     mod.add_type<context>("Context")
-        .method("real_const", &context::real_const);
+        MM(context, real_const);
 
     mod.add_type<expr>("Expr")
         .constructor<context &>()
-        // .constructor<context &, Z3_ast>()
-        .constructor<expr const &>()
+        MM(expr, is_bool)
+        MM(expr, is_int)
+        MM(expr, is_real)
+        MM(expr, is_arith)
+        MM(expr, is_algebraic)
+        MM(expr, numerator)
+        MM(expr, denominator)
+        MM(expr, get_numeral_int)
+        MM(expr, get_decimal_string)
         STRING(expr const &);
 
     EXPR_OPCALL(+, int)
@@ -51,17 +60,22 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     EXPR_OPCALL(>,  int)
 
     mod.add_type<model>("Model")
-        .method("num_consts", &model::num_consts)
-        .method("get_const_decl", &model::get_const_decl)
-        .method("getindex", [](const model& m, int i){return m[i];})
+        MM(model, size)
+        MM(model, num_consts)
+        MM(model, num_funcs)
+        MM(model, get_const_decl)
+        MM(model, get_func_decl)
+        MM(model, get_const_interp)
+        MM(model, get_func_interp)
+        .method("getindex", [](const model& m, int i){return m[i-1];})
         STRING(model const &);
 
     mod.add_type<func_decl>("FuncDecl")
-        .method("arity", &func_decl::arity)
-        .method("domain", &func_decl::domain)
-        .method("range", &func_decl::range)
-        .method("name", &func_decl::name)
-        .method("is_const", &func_decl::is_const)
+        MM(func_decl, arity)
+        MM(func_decl, domain)
+        MM(func_decl, range)
+        MM(func_decl, name)
+        MM(func_decl, is_const)
         .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
 
     mod.add_bits<check_result>("CheckResult", jlcxx::julia_type("CppEnum"));
