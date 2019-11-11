@@ -38,7 +38,8 @@ end
 types_show = [
     Expr,
     Solver,
-    Model
+    Model,
+    FuncDecl
 ]
 
 for T in types_show

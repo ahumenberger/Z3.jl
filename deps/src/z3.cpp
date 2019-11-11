@@ -50,6 +50,20 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     EXPR_OPCALL(<,  int)
     EXPR_OPCALL(>,  int)
 
+    mod.add_type<model>("Model")
+        .method("num_consts", &model::num_consts)
+        .method("get_const_decl", &model::get_const_decl)
+        .method("getindex", [](const model& m, int i){return m[i];})
+        STRING(model const &);
+
+    mod.add_type<func_decl>("FuncDecl")
+        .method("arity", &func_decl::arity)
+        .method("domain", &func_decl::domain)
+        .method("range", &func_decl::range)
+        .method("name", &func_decl::name)
+        .method("is_const", &func_decl::is_const)
+        .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
+
     mod.add_bits<check_result>("CheckResult", jlcxx::julia_type("CppEnum"));
     mod.set_const("unsat", unsat);
     mod.set_const("sat", sat);
@@ -63,18 +77,4 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("get_model", &solver::get_model)
         .method("unsat_core", &solver::unsat_core)
         STRING(solver const &);
-
-    mod.add_type<model>("Model")
-        .method("num_consts", &model::num_consts)
-        .method("get_const_decl", &model::get_const_decl)
-        .method("getindex", [](const model& m, int i){return m[i];})
-        STRING(model const &);
-
-    mod.add_type<func_decl>("FuncDecl")
-        .method("arity", &func_decl::arity)
-        .method("domain", &func_decl::domain)
-        .method("range", &func_decl::range)
-        .method("name", &func_decl::name)
-        .method("is_const", &func_decl::is_const);
-        // .method(&func_decl::operator());
 }
