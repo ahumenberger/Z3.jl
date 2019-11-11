@@ -27,7 +27,18 @@ template<> struct IsBits<check_result> : std::true_type {};
 
 JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 {
+    mod.add_type<config>("Config")
+        .method("set", static_cast<void (config::*)(char const *, char const *)>(&config::set))
+        .method("set", static_cast<void (config::*)(char const *, bool)>(&config::set))
+        .method("set", static_cast<void (config::*)(char const *, int)>(&config::set));
+
     mod.add_type<context>("Context")
+        .constructor<config &>()
+        .method("set", static_cast<void (context::*)(char const *, char const *)>(&context::set))
+        .method("set", static_cast<void (context::*)(char const *, bool)>(&context::set))
+        .method("set", static_cast<void (context::*)(char const *, int)>(&context::set))
+        MM(context, bool_const)
+        MM(context, int_const)
         MM(context, real_const);
 
     mod.add_type<expr>("Expr")
