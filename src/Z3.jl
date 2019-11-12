@@ -3,7 +3,7 @@ module Z3
 import Libdl
 using CxxWrap
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >
-import Base: string, getindex, size, length, push!
+import Base: string, getindex, size, length, push!, isequal
 import Base: numerator, denominator
 import Base: Int, Rational
 
@@ -30,25 +30,32 @@ function Int(x::Expr)
 end
 Rational{Int}(x::Expr) = Int(numerator(x)) // Int(denominator(x))
 
-or(vec::ExprVector) = mk_or(vec)
-or(vec::AbstractVector{Expr}) = or(vec...)
-function or(xs::Expr...)
-    vec = ExprVector(ctx(first(xs)))
+
+or(xs::ExprVector) = mk_or(xs)
+or(xs) = or(ExprVector(ctx(first(xs)), xs))
+or(xs...) = or(xs)
+
+and(xs::ExprVector) = mk_and(xs)
+and(xs) = and(ExprVector(ctx(first(xs)), xs))
+and(xs...) = and(xs)
+
+# ------------------------------------------------------------------------------
+# ExprVector
+
+function ExprVector(ctx::Context, xs)
+    vec = ExprVector(ctx)
     for x in xs
         push!(vec, x)
     end
-    or(vec)
+    vec
 end
 
-and(vec::ExprVector) = mk_and(vec)
-and(vec::AbstractVector{Expr}) = and(vec...)
-function and(xs::Expr...)
-    vec = ExprVector(ctx(first(xs)))
-    for x in xs
-        push!(vec, x)
-    end
-    and(vec)
-end
+Base.iterate(x::ExprVector, s=1) = s <= length(x) ? (x[s], s+1) : nothing
+
+# ------------------------------------------------------------------------------
+# Solver
+
+check(s::Solver, xs::AbstractVector{<:Expr}) = check(s, ExprVector(ctx(s), xs))
 
 # ------------------------------------------------------------------------------
 

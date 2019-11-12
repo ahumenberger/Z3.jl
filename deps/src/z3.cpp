@@ -20,6 +20,9 @@ using namespace z3;
         return stream.str();        \
     })
 
+#define ISEQUAL(TYPE) .method("isequal", [](const TYPE& x, const TYPE& y) { return x.id() == y.id(); })
+
+
 #define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
 
 #define AST_VECTOR(MOD, TYPE, NAME) \
@@ -47,6 +50,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         MM(context, bool_const)
         MM(context, int_const)
         MM(context, real_const)
+        MM(context, bool_val)
         .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
 
     mod.add_type<expr>("Expr")
@@ -61,6 +65,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         MM(expr, denominator)
         MM(expr, get_numeral_int)
         MM(expr, get_decimal_string)
+        MM(expr, id)
+        MM(expr, is_true)
+        ISEQUAL(expr)
         STRING(expr const &);
 
     // Friends of expr
@@ -93,6 +100,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         MM(model, get_func_decl)
         MM(model, get_const_interp)
         MM(model, get_func_interp)
+        MM(model, eval)
         .method("getindex", [](const model& m, int i){return m[i-1];})
         STRING(model const &);
 
@@ -114,6 +122,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .constructor<context &, char const *>()
         .method("add", static_cast<void (solver::*)(const expr&)>(&solver::add))
         .method("check", static_cast<check_result (solver::*)()>(&solver::check))
+        .method("check", static_cast<check_result (solver::*)(expr_vector)>(&solver::check))
+        MM(solver, ctx)
         MM(solver, get_model)
         MM(solver, unsat_core)
         MM(solver, reason_unknown)
