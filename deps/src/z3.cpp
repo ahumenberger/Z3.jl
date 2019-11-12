@@ -2,28 +2,35 @@
 #include "z3++.h"
 
 using namespace z3;
-using namespace jlcxx;
 
-#define EXPR_OPCALL(OP, TYPE) EXPR_NAMED_OPCALL(OP, OP, TYPE)
-#define EXPR_NAMED_OPCALL(FNAME, OP, TYPE) \
-    mod.method(#FNAME, [](const expr& a, const expr& b) {return a OP b;}); \
-    mod.method(#FNAME, [](const expr& a, TYPE b)        {return a OP b;}); \
-    mod.method(#FNAME, [](TYPE a, const expr& b)        {return a OP b;});
-#define EXPR_FCALL(FNAME, F, TYPE) \
-    mod.method(#FNAME, [](const expr& a, const expr& b) {return F(a, b);}); \
-    mod.method(#FNAME, [](const expr& a, TYPE b)        {return F(a, b);}); \
-    mod.method(#FNAME, [](TYPE a, const expr& b)        {return F(a, b);});
+#define EXPR_OPCALL(MOD, OP, TYPE) EXPR_NAMED_OPCALL(MOD, OP, OP, TYPE)
+#define EXPR_NAMED_OPCALL(MOD, FNAME, OP, TYPE) \
+    MOD.method(#FNAME, [](const expr& a, const expr& b) {return a OP b;}); \
+    MOD.method(#FNAME, [](const expr& a, TYPE b)        {return a OP b;}); \
+    MOD.method(#FNAME, [](TYPE a, const expr& b)        {return a OP b;});
+#define EXPR_FNCALL(MOD, FNAME, F, TYPE) \
+    MOD.method(#FNAME, [](const expr& a, const expr& b) {return F(a, b);}); \
+    MOD.method(#FNAME, [](const expr& a, TYPE b)        {return F(a, b);}); \
+    MOD.method(#FNAME, [](TYPE a, const expr& b)        {return F(a, b);});
 
 #define STRING(TYPE) \
-    .method("string", [](TYPE x){ \
-        std::ostringstream stream;       \
-        stream << x;                     \
-        return stream.str();             \
+    .method("string", [](TYPE x){   \
+        std::ostringstream stream;  \
+        stream << x;                \
+        return stream.str();        \
     })
 
-template<> struct IsBits<check_result> : std::true_type {};
-
 #define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
+
+#define AST_VECTOR(MOD, TYPE, NAME) \
+    MOD.add_type<TYPE>(#NAME)                                           \
+        .constructor<context &>()                                       \
+        .method("length", &TYPE::size)                                  \
+        .method("getindex", [](const TYPE& m, int i) {return m[i-1];})  \
+        .method("push!", &TYPE::push_back)                              \
+        STRING(TYPE const &)
+
+template<> struct jlcxx::IsBits<check_result> : std::true_type {};
 
 JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 {
@@ -39,10 +46,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("set", static_cast<void (context::*)(char const *, int)>(&context::set))
         MM(context, bool_const)
         MM(context, int_const)
-        MM(context, real_const);
+        MM(context, real_const)
+        .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
 
     mod.add_type<expr>("Expr")
         .constructor<context &>()
+        MM(expr, ctx)
         MM(expr, is_bool)
         MM(expr, is_int)
         MM(expr, is_real)
@@ -54,21 +63,27 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         MM(expr, get_decimal_string)
         STRING(expr const &);
 
-    EXPR_OPCALL(+, int)
-    EXPR_OPCALL(-, int)
+    // Friends of expr
+    EXPR_OPCALL(mod, +, int)
+    EXPR_OPCALL(mod, -, int)
     mod.method("-", [](const expr& a) {return -a;});
-    EXPR_OPCALL(*, int)
-    EXPR_OPCALL(/, int)
-    EXPR_FCALL(^, pw, int)
-    EXPR_NAMED_OPCALL(or,  ||, bool)
-    EXPR_NAMED_OPCALL(and, &&, bool)
+    EXPR_OPCALL(mod, *, int)
+    EXPR_OPCALL(mod, /, int)
+    EXPR_FNCALL(mod, ^, pw, int)
+    mod.method("mk_or", &mk_or);
+    mod.method("mk_and", &mk_and);
     mod.method("not", [](const expr& a) {return !a;});
-    EXPR_OPCALL(==, int)
-    EXPR_OPCALL(!=, int)
-    EXPR_OPCALL(<=, int)
-    EXPR_OPCALL(>=, int)
-    EXPR_OPCALL(<,  int)
-    EXPR_OPCALL(>,  int)
+    EXPR_OPCALL(mod, ==, int)
+    EXPR_OPCALL(mod, !=, int)
+    EXPR_OPCALL(mod, <=, int)
+    EXPR_OPCALL(mod, >=, int)
+    EXPR_OPCALL(mod, <,  int)
+    EXPR_OPCALL(mod, >,  int)
+
+    // AST_VECTOR(mod, ast_vector, AstVector);
+    AST_VECTOR(mod, expr_vector, ExprVector);
+    // AST_VECTOR(mod, sort_vector, SortVector);
+    // AST_VECTOR(mod, func_decl_vector, FuncDeclVector);
 
     mod.add_type<model>("Model")
         MM(model, size)
@@ -97,9 +112,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<solver>("Solver")
         .constructor<context &>()
         .constructor<context &, char const *>()
-        .method("add",      static_cast<void (solver::*)(const expr&)>(&solver::add))
-        .method("check",    static_cast<check_result (solver::*)()>(&solver::check))
-        .method("get_model", &solver::get_model)
-        .method("unsat_core", &solver::unsat_core)
+        .method("add", static_cast<void (solver::*)(const expr&)>(&solver::add))
+        .method("check", static_cast<check_result (solver::*)()>(&solver::check))
+        MM(solver, get_model)
+        MM(solver, unsat_core)
+        MM(solver, reason_unknown)
         STRING(solver const &);
 }
