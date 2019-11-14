@@ -20,9 +20,6 @@ using namespace z3;
         return stream.str();        \
     })
 
-#define ISEQUAL(TYPE) .method("isequal", [](const TYPE& x, const TYPE& y) { return x.id() == y.id(); })
-
-
 #define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
 
 #define AST_VECTOR(MOD, TYPE, NAME) \
@@ -68,7 +65,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(expr, get_decimal_string)
         MM(expr, id)
         MM(expr, is_true)
-        ISEQUAL(expr)
         STRING(expr const &);
 
     // Friends of expr

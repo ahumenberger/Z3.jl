@@ -31,6 +31,8 @@ end
 Rational{Int}(x::Expr) = Int(numerator(x)) // Int(denominator(x))
 
 
+Base.isequal(x::Expr, y::Expr) = isequal(id(x), id(y))
+
 or(xs::ExprVector) = mk_or(xs)
 or(xs) = or(ExprVector(ctx(first(xs)), xs))
 or(xs...) = or(xs)
