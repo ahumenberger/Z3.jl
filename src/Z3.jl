@@ -75,7 +75,7 @@ end
 
 # ------------------------------------------------------------------------------
 
-function __should_be_exported(sym::Symbol)
+function __should_be_exported(sym::Core.Symbol)
     s = string(sym)
     # Private
     startswith(s, "__")   && return false
@@ -90,6 +90,7 @@ function __should_be_exported(sym::Symbol)
     eval(sym) isa CheckResult && return false
     # Conflicts
     isequal(sym, :Expr) && return false
+    isequal(sym, :Symbol) && return false
     true
 end
 

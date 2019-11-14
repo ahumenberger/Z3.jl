@@ -85,10 +85,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
     EXPR_OPCALL(m, >,  int)
     m.method("ite", &ite);
 
-    // AST_VECTOR(m, ast_vector, AstVector);
+    AST_VECTOR(m, ast_vector, AstVector);
     AST_VECTOR(m, expr_vector, ExprVector);
-    // AST_VECTOR(m, sort_vector, SortVector);
-    // AST_VECTOR(m, func_decl_vector, FuncDeclVector);
+    AST_VECTOR(m, sort_vector, SortVector);
+    AST_VECTOR(m, func_decl_vector, FuncDeclVector);
 
     m.add_type<model>("Model")
         MM(model, size)
@@ -126,4 +126,17 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(solver, unsat_core)
         MM(solver, reason_unknown)
         STRING(solver const &);
+
+    m.add_type<symbol>("Symbol");
+    m.add_type<params>("Params");
+    m.add_type<param_descrs>("ParamDescrs");
+    m.add_type<ast>("Ast");
+    m.add_type<sort>("Sort");
+    m.add_type<goal>("Goal");
+    m.add_type<tactic>("Tactic");
+    m.add_type<probe>("Probe");
+    m.add_type<func_interp>("FuncInterp");
+    m.add_type<func_entry>("FuncEntry");
+    m.add_type<stats>("Stats");
+    m.add_type<apply_result>("ApplyResult");
 }
