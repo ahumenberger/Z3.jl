@@ -51,6 +51,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         MM(context, int_const)
         MM(context, real_const)
         MM(context, bool_val)
+        .method("int_val", static_cast<expr (context::*)(int)>(&context::int_val))
         .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
 
     mod.add_type<expr>("Expr")
@@ -86,6 +87,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     EXPR_OPCALL(mod, >=, int)
     EXPR_OPCALL(mod, <,  int)
     EXPR_OPCALL(mod, >,  int)
+    mod.method("ite", &ite);
 
     // AST_VECTOR(mod, ast_vector, AstVector);
     AST_VECTOR(mod, expr_vector, ExprVector);
