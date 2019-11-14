@@ -31,6 +31,25 @@ using namespace z3;
         STRING(TYPE const &)
 
 template<> struct jlcxx::IsBits<check_result> : std::true_type {};
+// template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
+
+template<> struct jlcxx::SuperType<solver>       { typedef object type; };
+template<> struct jlcxx::SuperType<goal>         { typedef object type; };
+template<> struct jlcxx::SuperType<apply_result> { typedef object type; };
+template<> struct jlcxx::SuperType<tactic>       { typedef object type; };
+template<> struct jlcxx::SuperType<probe>        { typedef object type; };
+template<> struct jlcxx::SuperType<optimize>     { typedef object type; };
+template<> struct jlcxx::SuperType<fixedpoint>   { typedef object type; };
+template<> struct jlcxx::SuperType<param_descrs> { typedef object type; };
+template<> struct jlcxx::SuperType<params>       { typedef object type; };
+template<> struct jlcxx::SuperType<ast>          { typedef object type; };
+template<> struct jlcxx::SuperType<func_entry>   { typedef object type; };
+template<> struct jlcxx::SuperType<func_interp>  { typedef object type; };
+template<> struct jlcxx::SuperType<model>        { typedef object type; };
+template<> struct jlcxx::SuperType<stats>        { typedef object type; };
+template<> struct jlcxx::SuperType<expr>         { typedef ast type; };
+template<> struct jlcxx::SuperType<sort>         { typedef ast type; };
+template<> struct jlcxx::SuperType<func_decl>    { typedef ast type; };
 
 JLCXX_MODULE define_julia_module(jlcxx::Module& m)
 {
@@ -51,9 +70,16 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .method("int_val", static_cast<expr (context::*)(int)>(&context::int_val))
         .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
 
-    m.add_type<expr>("Expr")
+    m.add_type<object>("Object")
         .constructor<context &>()
-        MM(expr, ctx)
+        MM(object, ctx);
+        // MM(object, check_error);
+
+    m.add_type<ast>("Ast", jlcxx::julia_type<object>());
+    m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
+
+    m.add_type<expr>("Expr", jlcxx::julia_type<ast>())
+        .constructor<context &>()
         MM(expr, is_bool)
         MM(expr, is_int)
         MM(expr, is_real)
@@ -90,7 +116,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
     AST_VECTOR(m, sort_vector, SortVector);
     AST_VECTOR(m, func_decl_vector, FuncDeclVector);
 
-    m.add_type<model>("Model")
+    m.add_type<model>("Model", jlcxx::julia_type<object>())
         MM(model, size)
         MM(model, num_consts)
         MM(model, num_funcs)
@@ -102,7 +128,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .method("getindex", [](const model& m, int i){return m[i-1];})
         STRING(model const &);
 
-    m.add_type<func_decl>("FuncDecl")
+    m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
         MM(func_decl, arity)
         MM(func_decl, domain)
         MM(func_decl, range)
@@ -115,28 +141,25 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
     m.set_const("sat", sat);
     m.set_const("unknown", unknown);
 
-    m.add_type<solver>("Solver")
+    m.add_type<solver>("Solver", jlcxx::julia_type<object>())
         .constructor<context &>()
         .constructor<context &, char const *>()
         .method("add", static_cast<void (solver::*)(const expr&)>(&solver::add))
         .method("check", static_cast<check_result (solver::*)()>(&solver::check))
         .method("check", static_cast<check_result (solver::*)(expr_vector)>(&solver::check))
-        MM(solver, ctx)
         MM(solver, get_model)
         MM(solver, unsat_core)
         MM(solver, reason_unknown)
         STRING(solver const &);
 
-    m.add_type<symbol>("Symbol");
-    m.add_type<params>("Params");
-    m.add_type<param_descrs>("ParamDescrs");
-    m.add_type<ast>("Ast");
-    m.add_type<sort>("Sort");
-    m.add_type<goal>("Goal");
-    m.add_type<tactic>("Tactic");
-    m.add_type<probe>("Probe");
-    m.add_type<func_interp>("FuncInterp");
-    m.add_type<func_entry>("FuncEntry");
-    m.add_type<stats>("Stats");
-    m.add_type<apply_result>("ApplyResult");
+    m.add_type<symbol>("Symbol", jlcxx::julia_type<object>());
+    m.add_type<params>("Params", jlcxx::julia_type<object>());
+    m.add_type<param_descrs>("ParamDescrs", jlcxx::julia_type<object>());
+    m.add_type<goal>("Goal", jlcxx::julia_type<object>());
+    m.add_type<tactic>("Tactic", jlcxx::julia_type<object>());
+    m.add_type<probe>("Probe", jlcxx::julia_type<object>());
+    m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>());
+    m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>());
+    m.add_type<stats>("Stats", jlcxx::julia_type<object>());
+    m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>());
 }
