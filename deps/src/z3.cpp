@@ -75,7 +75,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(object, ctx);
         // MM(object, check_error);
 
-    m.add_type<ast>("Ast", jlcxx::julia_type<object>());
+    m.add_type<ast>("Ast", jlcxx::julia_type<object>())
+        .method("string", &ast::to_string);
+
     m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
 
     m.add_type<expr>("Expr", jlcxx::julia_type<ast>())
@@ -90,8 +92,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(expr, get_numeral_int)
         MM(expr, get_decimal_string)
         MM(expr, id)
-        MM(expr, is_true)
-        STRING(expr const &);
+        MM(expr, is_true);
+        // STRING(expr const &);
 
     // Friends of expr
     EXPR_OPCALL(m, +, int)

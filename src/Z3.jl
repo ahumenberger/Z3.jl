@@ -62,11 +62,10 @@ check(s::Solver, xs::AbstractVector{<:Expr}) = check(s, ExprVector(ctx(s), xs))
 # ------------------------------------------------------------------------------
 
 types_show = [
-    Expr,
+    Ast,
     ExprVector,
     Solver,
-    Model,
-    # FuncDecl
+    Model
 ]
 
 for T in types_show
