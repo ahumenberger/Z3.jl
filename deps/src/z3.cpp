@@ -14,7 +14,7 @@ using namespace z3;
     MOD.method(#FNAME, [](TYPE a, const expr& b)        {return F(a, b);});
 
 #define STRING(TYPE) \
-    .method("string", [](TYPE x){   \
+    method("string", [](TYPE x){   \
         std::ostringstream stream;  \
         stream << x;                \
         return stream.str();        \
@@ -121,11 +121,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
                 wrapped.method("length", &WrappedT::size);
                 wrapped.method("getindex", [](const WrappedT& m, int i) {return m[i-1];});
                 wrapped.method("push!", &WrappedT::push_back);
-                wrapped.method("string", [](const WrappedT& x){
-                    std::ostringstream stream;
-                    stream << x;
-                    return stream.str();
-                });
+                wrapped.STRING(const WrappedT&);
             });
 
     m.add_type<model>("Model", jlcxx::julia_type<object>())
@@ -138,7 +134,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .MM(model, get_func_interp)
         .MM(model, eval)
         .method("getindex", [](const model& m, int i){return m[i-1];})
-        STRING(model const &);
+        .STRING(const model&);
 
     m.add_bits<check_result>("CheckResult", jlcxx::julia_type("CppEnum"));
     m.set_const("unsat", unsat);
@@ -154,7 +150,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .MM(solver, get_model)
         .MM(solver, unsat_core)
         .MM(solver, reason_unknown)
-        STRING(solver const &);
+        .STRING(const solver&);
 
     m.add_type<symbol>("Symbol", jlcxx::julia_type<object>());
     m.add_type<params>("Params", jlcxx::julia_type<object>());
