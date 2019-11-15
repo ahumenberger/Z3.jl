@@ -13,6 +13,11 @@ function __init__()
     @initcxx
 end
 
+const AstVector      = AstVectorTpl{Ast}
+const ExprVector     = AstVectorTpl{Expr}
+const SortVector     = AstVectorTpl{Sort}
+const FuncDeclVector = AstVectorTpl{FuncDecl}
+
 # ------------------------------------------------------------------------------
 # Model
 
@@ -63,7 +68,7 @@ check(s::Solver, xs::AbstractVector{<:Expr}) = check(s, ExprVector(ctx(s), xs))
 
 types_show = [
     Ast,
-    ExprVector,
+    AstVectorTpl,
     Solver,
     Model
 ]

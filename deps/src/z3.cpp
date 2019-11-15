@@ -22,14 +22,6 @@ using namespace z3;
 
 #define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
 
-#define AST_VECTOR(MOD, TYPE, NAME) \
-    MOD.add_type<TYPE>(#NAME)                                           \
-        .constructor<context &>()                                       \
-        .method("length", &TYPE::size)                                  \
-        .method("getindex", [](const TYPE& m, int i) {return m[i-1];})  \
-        .method("push!", &TYPE::push_back)                              \
-        STRING(TYPE const &)
-
 template<> struct jlcxx::IsBits<check_result> : std::true_type {};
 // template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
 
@@ -80,6 +72,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
 
     m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
 
+    m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
+        MM(func_decl, arity)
+        MM(func_decl, domain)
+        MM(func_decl, range)
+        MM(func_decl, name)
+        MM(func_decl, is_const)
+        .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
+
     m.add_type<expr>("Expr", jlcxx::julia_type<ast>())
         .constructor<context &>()
         MM(expr, is_bool)
@@ -93,7 +93,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(expr, get_decimal_string)
         MM(expr, id)
         MM(expr, is_true);
-        // STRING(expr const &);
 
     // Friends of expr
     EXPR_OPCALL(m, +, int)
@@ -113,10 +112,21 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
     EXPR_OPCALL(m, >,  int)
     m.method("ite", &ite);
 
-    AST_VECTOR(m, ast_vector, AstVector);
-    AST_VECTOR(m, expr_vector, ExprVector);
-    AST_VECTOR(m, sort_vector, SortVector);
-    AST_VECTOR(m, func_decl_vector, FuncDeclVector);
+    m.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("AstVectorTpl")
+        .apply<ast_vector_tpl<ast>, ast_vector_tpl<expr>, ast_vector_tpl<sort>, ast_vector_tpl<func_decl>>(
+            [](auto wrapped)
+            {
+                typedef typename decltype(wrapped)::type WrappedT;
+                wrapped.template constructor<context &>();
+                wrapped.method("length", &WrappedT::size);
+                wrapped.method("getindex", [](const WrappedT& m, int i) {return m[i-1];});
+                wrapped.method("push!", &WrappedT::push_back);
+                wrapped.method("string", [](const WrappedT& x){
+                    std::ostringstream stream;
+                    stream << x;
+                    return stream.str();
+                });
+            });
 
     m.add_type<model>("Model", jlcxx::julia_type<object>())
         MM(model, size)
@@ -129,14 +139,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         MM(model, eval)
         .method("getindex", [](const model& m, int i){return m[i-1];})
         STRING(model const &);
-
-    m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
-        MM(func_decl, arity)
-        MM(func_decl, domain)
-        MM(func_decl, range)
-        MM(func_decl, name)
-        MM(func_decl, is_const)
-        .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
 
     m.add_bits<check_result>("CheckResult", jlcxx::julia_type("CppEnum"));
     m.set_const("unsat", unsat);
