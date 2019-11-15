@@ -20,7 +20,7 @@ using namespace z3;
         return stream.str();        \
     })
 
-#define MM(CLASS,FUNC) .method(#FUNC, &CLASS::FUNC)
+#define MM(CLASS,FUNC) method(#FUNC, &CLASS::FUNC)
 
 template<> struct jlcxx::IsBits<check_result> : std::true_type {};
 // template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
@@ -55,16 +55,16 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .method("set", static_cast<void (context::*)(char const *, char const *)>(&context::set))
         .method("set", static_cast<void (context::*)(char const *, bool)>(&context::set))
         .method("set", static_cast<void (context::*)(char const *, int)>(&context::set))
-        MM(context, bool_const)
-        MM(context, int_const)
-        MM(context, real_const)
-        MM(context, bool_val)
+        .MM(context, bool_const)
+        .MM(context, int_const)
+        .MM(context, real_const)
+        .MM(context, bool_val)
         .method("int_val", static_cast<expr (context::*)(int)>(&context::int_val))
         .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
 
     m.add_type<object>("Object")
         .constructor<context &>()
-        MM(object, ctx);
+        .MM(object, ctx);
         // MM(object, check_error);
 
     m.add_type<ast>("Ast", jlcxx::julia_type<object>())
@@ -73,26 +73,26 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
     m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
 
     m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
-        MM(func_decl, arity)
-        MM(func_decl, domain)
-        MM(func_decl, range)
-        MM(func_decl, name)
-        MM(func_decl, is_const)
+        .MM(func_decl, arity)
+        .MM(func_decl, domain)
+        .MM(func_decl, range)
+        .MM(func_decl, name)
+        .MM(func_decl, is_const)
         .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
 
     m.add_type<expr>("Expr", jlcxx::julia_type<ast>())
         .constructor<context &>()
-        MM(expr, is_bool)
-        MM(expr, is_int)
-        MM(expr, is_real)
-        MM(expr, is_arith)
-        MM(expr, is_algebraic)
-        MM(expr, numerator)
-        MM(expr, denominator)
-        MM(expr, get_numeral_int)
-        MM(expr, get_decimal_string)
-        MM(expr, id)
-        MM(expr, is_true);
+        .MM(expr, is_bool)
+        .MM(expr, is_int)
+        .MM(expr, is_real)
+        .MM(expr, is_arith)
+        .MM(expr, is_algebraic)
+        .MM(expr, numerator)
+        .MM(expr, denominator)
+        .MM(expr, get_numeral_int)
+        .MM(expr, get_decimal_string)
+        .MM(expr, id)
+        .MM(expr, is_true);
 
     // Friends of expr
     EXPR_OPCALL(m, +, int)
@@ -129,14 +129,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
             });
 
     m.add_type<model>("Model", jlcxx::julia_type<object>())
-        MM(model, size)
-        MM(model, num_consts)
-        MM(model, num_funcs)
-        MM(model, get_const_decl)
-        MM(model, get_func_decl)
-        MM(model, get_const_interp)
-        MM(model, get_func_interp)
-        MM(model, eval)
+        .MM(model, size)
+        .MM(model, num_consts)
+        .MM(model, num_funcs)
+        .MM(model, get_const_decl)
+        .MM(model, get_func_decl)
+        .MM(model, get_const_interp)
+        .MM(model, get_func_interp)
+        .MM(model, eval)
         .method("getindex", [](const model& m, int i){return m[i-1];})
         STRING(model const &);
 
@@ -151,9 +151,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& m)
         .method("add", static_cast<void (solver::*)(const expr&)>(&solver::add))
         .method("check", static_cast<check_result (solver::*)()>(&solver::check))
         .method("check", static_cast<check_result (solver::*)(expr_vector)>(&solver::check))
-        MM(solver, get_model)
-        MM(solver, unsat_core)
-        MM(solver, reason_unknown)
+        .MM(solver, get_model)
+        .MM(solver, unsat_core)
+        .MM(solver, reason_unknown)
         STRING(solver const &);
 
     m.add_type<symbol>("Symbol", jlcxx::julia_type<object>());
