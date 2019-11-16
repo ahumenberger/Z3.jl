@@ -23,6 +23,7 @@ using namespace z3;
 #define MM(CLASS, FUNC) method(#FUNC, &CLASS::FUNC)
 
 template<> struct jlcxx::IsBits<check_result> : std::true_type {};
+template<> struct jlcxx::IsBits<rounding_mode> : std::true_type {};
 // template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
 
 template<> struct jlcxx::SuperType<solver>       { typedef object type; };
@@ -43,24 +44,116 @@ template<> struct jlcxx::SuperType<expr>         { typedef ast type; };
 template<> struct jlcxx::SuperType<sort>         { typedef ast type; };
 template<> struct jlcxx::SuperType<func_decl>    { typedef ast type; };
 
+JLCXX_MODULE define_context(jlcxx::TypeWrapper<context> &c)
+{
+    c.constructor<config &>();
+    c.method("set", static_cast<void (context::*)(char const *, char const *)>(&context::set));
+    c.method("set", static_cast<void (context::*)(char const *, bool)>(&context::set));
+    c.method("set", static_cast<void (context::*)(char const *, int)>(&context::set));
+
+    c.MM(context, interrupt);
+
+    c.MM(context, str_symbol);
+    c.MM(context, int_symbol);
+    c.MM(context, bool_sort);
+    c.MM(context, int_sort);
+    c.MM(context, real_sort);
+    c.MM(context, bv_sort);
+    c.MM(context, string_sort);
+    c.MM(context, seq_sort);
+    c.MM(context, re_sort);
+    c.method("array_sort", static_cast<sort (context::*)(sort, sort)>(&context::array_sort));
+    c.method("array_sort", static_cast<sort (context::*)(sort_vector const&, sort)>(&context::array_sort));
+    c.method("fpa_sort", static_cast<sort (context::*)(unsigned, unsigned)>(&context::fpa_sort));
+    //  template<size_t precision>
+    //  sort fpa_sort();
+    c.MM(context, fpa_rounding_mode);
+    c.MM(context, set_rounding_mode);
+    // c.MM(context, enumeration_sort);
+    // c.MM(context, tuple_sort);
+    c.method("uninterpreted_sort", static_cast<sort (context::*)(char const*)>(&context::uninterpreted_sort));
+    c.method("uninterpreted_sort", static_cast<sort (context::*)(symbol const&)>(&context::uninterpreted_sort));
+
+    c.method("func", static_cast<func_decl (context::*)(symbol const &, unsigned, sort const *, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, unsigned, sort const *, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(symbol const &, sort_vector const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort_vector const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort const &, sort const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort const &, sort const &, sort const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort const &, sort const &, sort const &, sort const &, sort const &)>(&context::function));
+    c.method("func", static_cast<func_decl (context::*)(char const *, sort const &, sort const &, sort const &, sort const &, sort const &, sort const &)>(&context::function));
+
+    c.method("recfun", static_cast<func_decl (context::*)(symbol const &, unsigned, sort const *, sort const &)>(&context::recfun));
+    c.method("recfun", static_cast<func_decl (context::*)(char const *, unsigned, sort const *, sort const &)>(&context::recfun));
+    c.method("recfun", static_cast<func_decl (context::*)(char const *, sort const &, sort const &)>(&context::recfun));
+    c.method("recfun", static_cast<func_decl (context::*)(char const *, sort const &, sort const &, sort const &)>(&context::recfun));
+
+    c.MM(context, recdef);
+
+    c.method("constant", static_cast<expr (context::*)(symbol const &, sort const &)>(&context::constant));
+    c.method("constant", static_cast<expr (context::*)(char const *, sort const &)>(&context::constant));
+    c.MM(context, bool_const);
+    c.MM(context, int_const);
+    c.MM(context, real_const);
+    c.MM(context, bv_const);
+    c.method("fpa_const", static_cast<expr (context::*)(char const *, unsigned, unsigned)>(&context::fpa_const));
+    // template<size_t precision>
+    // expr fpa_const(char const * name);
+
+    c.MM(context, bool_val);
+
+    c.method("int_val", static_cast<expr (context::*)(int)>(&context::int_val));
+    c.method("int_val", static_cast<expr (context::*)(unsigned)>(&context::int_val));
+    c.method("int_val", static_cast<expr (context::*)(int64_t)>(&context::int_val));
+    c.method("int_val", static_cast<expr (context::*)(uint64_t)>(&context::int_val));
+    c.method("int_val", static_cast<expr (context::*)(char const *)>(&context::int_val));
+
+    c.method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
+    c.method("real_val", static_cast<expr (context::*)(int)>(&context::real_val));
+    c.method("real_val", static_cast<expr (context::*)(unsigned)>(&context::real_val));
+    c.method("real_val", static_cast<expr (context::*)(int64_t)>(&context::real_val));
+    c.method("real_val", static_cast<expr (context::*)(uint64_t)>(&context::real_val));
+    c.method("real_val", static_cast<expr (context::*)(char const *)>(&context::real_val));
+
+    c.method("bv_val", static_cast<expr (context::*)(int, unsigned)>(&context::bv_val));
+    c.method("bv_val", static_cast<expr (context::*)(unsigned, unsigned)>(&context::bv_val));
+    c.method("bv_val", static_cast<expr (context::*)(int64_t, unsigned)>(&context::bv_val));
+    c.method("bv_val", static_cast<expr (context::*)(uint64_t, unsigned)>(&context::bv_val));
+    c.method("bv_val", static_cast<expr (context::*)(char const *, unsigned)>(&context::bv_val));
+    c.method("bv_val", static_cast<expr (context::*)(unsigned, bool const *)>(&context::bv_val));
+
+    c.method("fpa_val", static_cast<expr (context::*)(double)>(&context::fpa_val));
+    c.method("fpa_val", static_cast<expr (context::*)(float)>(&context::fpa_val));
+
+    // c.method("string_val", static_cast<expr (context::*)(char const*)>(&context::string_val));
+    c.method("string_val", static_cast<expr (context::*)(char const*, unsigned)>(&context::string_val));
+    c.method("string_val", static_cast<expr (context::*)(std::string const&)>(&context::string_val));
+
+    c.MM(context, num_val);
+
+    c.method("parse_string", static_cast<expr_vector (context::*)(char const*)>(&context::parse_string));
+    c.method("parse_string", static_cast<expr_vector (context::*)(char const*, sort_vector const&, func_decl_vector const&)>(&context::parse_string));
+    c.method("parse_file", static_cast<expr_vector (context::*)(char const*)>(&context::parse_file));
+    c.method("parse_file", static_cast<expr_vector (context::*)(char const*, sort_vector const&, func_decl_vector const&)>(&context::parse_file));;
+}
+
 JLCXX_MODULE define_julia_module(jlcxx::Module &m)
 {
+    m.add_bits<rounding_mode>("RoundingMode", jlcxx::julia_type("CppEnum"));
+    m.set_const("RNA", RNA);
+    m.set_const("RNE", RNE);
+    m.set_const("RTP", RTP);
+    m.set_const("RTN", RTN);
+    m.set_const("RTZ", RTZ);
+
     m.add_type<config>("Config")
         .method("set", static_cast<void (config::*)(char const *, char const *)>(&config::set))
         .method("set", static_cast<void (config::*)(char const *, bool)>(&config::set))
         .method("set", static_cast<void (config::*)(char const *, int)>(&config::set));
 
-    m.add_type<context>("Context")
-        .constructor<config &>()
-        .method("set", static_cast<void (context::*)(char const *, char const *)>(&context::set))
-        .method("set", static_cast<void (context::*)(char const *, bool)>(&context::set))
-        .method("set", static_cast<void (context::*)(char const *, int)>(&context::set))
-        .MM(context, bool_const)
-        .MM(context, int_const)
-        .MM(context, real_const)
-        .MM(context, bool_val)
-        .method("int_val", static_cast<expr (context::*)(int)>(&context::int_val))
-        .method("real_val", static_cast<expr (context::*)(int, int)>(&context::real_val));
+    jlcxx::TypeWrapper<context> t = m.add_type<context>("Context");
+    define_context(t);
 
     m.add_type<object>("Object")
         .constructor<context &>()
