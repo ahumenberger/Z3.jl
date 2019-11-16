@@ -19,7 +19,7 @@ if !isdir(z3_builddir)
     mkdir(z3_builddir)
 end
 cd(z3_builddir)
-run(`cmake $z3_dir`)
+run(`$cmake $z3_dir`)
 run(`make`)
 
 JlCxx_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
