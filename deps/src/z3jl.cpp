@@ -163,6 +163,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
     m.add_type<ast>("Ast", jlcxx::julia_type<object>())
         .method("string", &ast::to_string);
 
+    m.method("isequal", &eq);
+
     m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
 
     m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
