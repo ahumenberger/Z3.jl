@@ -11,7 +11,11 @@ import Base: Int, Rational
 
 function __init__()
     @initcxx
+    __defaultctx[] = Context()
 end
+
+const __defaultctx = Ref{Context}()
+defaultctx() = __defaultctx[]
 
 const AstVector      = AstVectorTpl{Ast}
 const ExprVector     = AstVectorTpl{Expr}
