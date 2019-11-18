@@ -3,7 +3,7 @@ module Z3
 import Libdl
 using CxxWrap
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >
-import Base: string, getindex, size, length, push!, isequal
+import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
 import Base: Int, Rational
 
