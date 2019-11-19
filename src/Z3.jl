@@ -70,7 +70,7 @@ check(s::Solver, xs::AbstractVector{<:Expr}) = check(s, ExprVector(ctx(s), xs))
 # ------------------------------------------------------------------------------
 # Model
 
-Base.MainInclude.eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_completion)
+eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_completion)
 
 # ------------------------------------------------------------------------------
 
