@@ -227,7 +227,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(model, get_func_decl)
         .MM(model, get_const_interp)
         .MM(model, get_func_interp)
-        .MM(model, eval)
+        .method("__eval", &model::eval)
         .method("getindex", [](const model &m, int i) { return m[i - 1]; })
         .STRING(const model &);
 

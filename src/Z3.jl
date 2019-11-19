@@ -66,6 +66,11 @@ Base.iterate(x::ExprVector, s=1) = s <= length(x) ? (x[s], s+1) : nothing
 check(s::Solver, xs::AbstractVector{<:Expr}) = check(s, ExprVector(ctx(s), xs))
 
 # ------------------------------------------------------------------------------
+# Model
+
+Base.MainInclude.eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_completion)
+
+# ------------------------------------------------------------------------------
 
 types_show = [
     Ast,
