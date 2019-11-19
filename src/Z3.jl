@@ -85,23 +85,27 @@ end
 
 # ------------------------------------------------------------------------------
 
-function __should_be_exported(sym::Core.Symbol)
-    s = string(sym)
+function __should_be_exported(s::Core.Symbol)
+    str = string(s)
     # Private
-    startswith(s, "__")   && return false
-    startswith(s, "#")    && return false
-    isequal(s, "Z3")      && return false
-    isequal(s, "include") && return false
-    isequal(s, "eval")    && return false
-    # Types created by CxxWrap
-    endswith(s, "Allocated") && return false
-    endswith(s, "Ref")       && return false
+    startswith(str, "__")      && return false
+    startswith(str, "#")       && return false
+    # Auxiliary types created by CxxWrap
+    endswith(str, "Allocated") && return false
+    endswith(str, "Ref")       && return false
+    # Own module
+    isequal(s, :Z3)            && return false
+    # Methods from Base.MainInclude
+    isequal(s, :include)       && return false
+    isequal(s, :eval)          && return false
     # Enums
-    eval(sym) isa CheckResult && return false
-    # Conflicts
-    isequal(sym, :Expr) && return false
-    isequal(sym, :Symbol) && return false
-    true
+    eval(s) isa CheckResult    && return false
+    eval(s) isa RoundingMode   && return false
+    # Conflicting types of Z3 and Base/Core
+    isequal(s, :Expr)          && return false
+    isequal(s, :Symbol)        && return false
+    # Export otherwise
+    return true
 end
 
 for name in names(Z3, all=true, imported=false)
