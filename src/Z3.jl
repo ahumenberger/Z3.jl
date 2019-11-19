@@ -17,6 +17,8 @@ end
 const __main_ctx = Ref{Context}()
 main_ctx() = __main_ctx[]
 
+# ------------------------------------------------------------------------------
+
 const AstVector      = AstVectorTpl{Ast}
 const ExprVector     = AstVectorTpl{Expr}
 const SortVector     = AstVectorTpl{Sort}
