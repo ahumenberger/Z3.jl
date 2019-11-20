@@ -24,6 +24,8 @@ const ExprVector     = AstVectorTpl{Expr}
 const SortVector     = AstVectorTpl{Sort}
 const FuncDeclVector = AstVectorTpl{FuncDecl}
 
+Base.iterate(x::AstVectorTpl, s=1) = s <= length(x) ? (x[s], s+1) : nothing
+
 # ------------------------------------------------------------------------------
 # Model
 
@@ -59,8 +61,6 @@ function ExprVector(ctx::Context, xs)
     end
     vec
 end
-
-Base.iterate(x::ExprVector, s=1) = s <= length(x) ? (x[s], s+1) : nothing
 
 # ------------------------------------------------------------------------------
 # Solver
