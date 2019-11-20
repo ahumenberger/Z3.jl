@@ -24,13 +24,13 @@ const ExprVector     = AstVectorTpl{Expr}
 const SortVector     = AstVectorTpl{Sort}
 const FuncDeclVector = AstVectorTpl{FuncDecl}
 
-Base.iterate(x::AstVectorTpl, s=1) = s <= length(x) ? (x[s], s+1) : nothing
+Base.iterate(x::AstVectorTpl, s = 1) = s <= length(x) ? (x[s], s + 1) : nothing
 
 # ------------------------------------------------------------------------------
 # Model
 
-consts(m::Model) = (get_const_decl(m, i)()=>get_const_interp(m, get_const_decl(m, i)) for i in 0:num_consts(m)-1)
-funcs(m::Model) = (get_func_decl(m, i)=>get_func_interp(m, get_func_decl(m, i)) for i in 0:num_funcs(m)-1)
+consts(m::Model) = (get_const_decl(m, i)() => get_const_interp(m, get_const_decl(m, i)) for i in 0:num_consts(m) - 1)
+funcs(m::Model) = (get_func_decl(m, i) => get_func_interp(m, get_func_decl(m, i)) for i in 0:num_funcs(m) - 1)
 
 Base.length(m::Model) = size(m)
 
@@ -110,7 +110,7 @@ function __should_be_exported(s::Core.Symbol)
     return true
 end
 
-for name in names(Z3, all=true, imported=false)
+for name in names(Z3, all = true, imported = false)
     if __should_be_exported(name)
         @eval export $name 
     end
