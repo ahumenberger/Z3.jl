@@ -161,6 +161,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
     // MM(object, check_error);
 
     m.add_type<ast>("Ast", jlcxx::julia_type<object>())
+        .constructor<context &>()
         .MM(ast, hash)
         .method("string", &ast::to_string);
 
