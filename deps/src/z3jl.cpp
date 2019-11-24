@@ -366,7 +366,13 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
 
     // TODO: Friends of z3::probe
 
-    m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>());
+    m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>())
+        .MM(func_interp, else_value)
+        .MM(func_interp, num_entries)
+        .MM(func_interp, entry)
+        .MM(func_interp, add_entry)
+        .MM(func_interp, set_else);
+
     m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>());
     m.add_type<stats>("Stats", jlcxx::julia_type<object>());
     m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>());
