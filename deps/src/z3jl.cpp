@@ -378,6 +378,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(func_entry, num_args)
         .MM(func_entry, arg);
 
-    m.add_type<stats>("Stats", jlcxx::julia_type<object>());
+    m.add_type<stats>("Stats", jlcxx::julia_type<object>())
+        .constructor<context &>()
+        .MM(stats, size)
+        .MM(stats, key)
+        .MM(stats, is_uint)
+        .MM(stats, is_double)
+        .MM(stats, uint_value)
+        .MM(stats, double_value);
+
     m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>());
 }
