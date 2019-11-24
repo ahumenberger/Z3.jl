@@ -190,12 +190,24 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(sort, array_range);
 
     m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
+        .constructor<context &>()
+        .MM(func_decl, id)
         .MM(func_decl, arity)
         .MM(func_decl, domain)
         .MM(func_decl, range)
         .MM(func_decl, name)
+        .MM(func_decl, transitive_closure)
         .MM(func_decl, is_const)
-        .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()));
+        .method(static_cast<expr (func_decl::*)() const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr_vector const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(int) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &, expr const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &, int) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(int, expr const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &, expr const &, expr const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &, expr const &, expr const &, expr const &) const>(&func_decl::operator()))
+        .method(static_cast<expr (func_decl::*)(expr const &, expr const &, expr const &, expr const &, expr const &) const>(&func_decl::operator()));
 
     m.add_type<expr>("Expr", jlcxx::julia_type<ast>())
         .constructor<context &>()
