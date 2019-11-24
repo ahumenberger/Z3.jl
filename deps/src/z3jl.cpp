@@ -358,7 +358,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(tactic, help)
         .MM(tactic, get_param_descrs);
 
-    m.add_type<probe>("Probe", jlcxx::julia_type<object>());
+    m.add_type<probe>("Probe", jlcxx::julia_type<object>())
+        .constructor<context &, char const *>()
+        .constructor<context &, double>()
+        .method(&probe::operator())
+        .MM(probe, apply);
+
+    // TODO: Friends of z3::probe
+
     m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>());
     m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>());
     m.add_type<stats>("Stats", jlcxx::julia_type<object>());
