@@ -387,5 +387,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(stats, uint_value)
         .MM(stats, double_value);
 
-    m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>());
+    m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>())
+        .method("getindex", [](const apply_result &r, int i) { return r[i - 1]; })
+        .MM(apply_result, size);
 }
