@@ -253,6 +253,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
             });
 
     m.add_type<model>("Model", jlcxx::julia_type<object>())
+        .constructor<context &>()
         .MM(model, size)
         .MM(model, num_consts)
         .MM(model, num_funcs)
@@ -260,6 +261,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(model, get_func_decl)
         .MM(model, get_const_interp)
         .MM(model, get_func_interp)
+        .MM(model, has_interp)
+        .MM(model, add_func_interp)
+        .MM(model, add_const_interp)
         .method("__eval", &model::eval)
         .method("getindex", [](const model &m, int i) { return m[i - 1]; })
         .STRING(const model &);
