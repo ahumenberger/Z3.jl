@@ -373,7 +373,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(func_interp, add_entry)
         .MM(func_interp, set_else);
 
-    m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>());
+    m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>())
+        .MM(func_entry, value)
+        .MM(func_entry, num_args)
+        .MM(func_entry, arg);
+
     m.add_type<stats>("Stats", jlcxx::julia_type<object>());
     m.add_type<apply_result>("ApplyResult", jlcxx::julia_type<object>());
 }
