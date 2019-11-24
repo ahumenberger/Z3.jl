@@ -166,7 +166,27 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
 
     m.method("isequal", &eq);
 
-    m.add_type<sort>("Sort", jlcxx::julia_type<ast>());
+    m.add_type<sort>("Sort", jlcxx::julia_type<ast>())
+        .constructor<context &>()
+        .MM(sort, id)
+        .MM(sort, name)
+        .MM(sort, is_bool)
+        .MM(sort, is_int)
+        .MM(sort, is_real)
+        .MM(sort, is_arith)
+        .MM(sort, is_bv)
+        .MM(sort, is_array)
+        .MM(sort, is_datatype)
+        .MM(sort, is_relation)
+        .MM(sort, is_seq)
+        .MM(sort, is_re)
+        .MM(sort, is_finite_domain)
+        .MM(sort, is_fpa)
+        .MM(sort, bv_size)
+        .MM(sort, fpa_ebits)
+        .MM(sort, fpa_sbits)
+        .MM(sort, array_domain)
+        .MM(sort, array_range);
 
     m.add_type<func_decl>("FuncDecl", jlcxx::julia_type<ast>())
         .MM(func_decl, arity)
