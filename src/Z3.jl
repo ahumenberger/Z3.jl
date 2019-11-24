@@ -87,6 +87,19 @@ end
 
 # ------------------------------------------------------------------------------
 
+# function __with_main_ctx(name::Core.Symbol, m::Method)
+#     try
+#         arg_types = fieldtypes(m.sig)[2:end]
+#         params = [:($(Core.Symbol(string("x", i)))::$T) for (i, T) in enumerate(arg_types) if !(Context <: T)]
+#         length(arg_types) == length(params) && return nothing
+#         call_args = [Context <: T ? :(main_ctx()) : :($(Core.Symbol(string("x", i)))) for (i, T) in enumerate(arg_types)]
+#         :($(name)($(params...)) = $(name)($(call_args...)))
+#     catch
+#         # TODO: varargs not supported yet
+#         return nothing
+#     end
+# end
+
 function __should_be_exported(s::Core.Symbol)
     str = string(s)
     # Private
@@ -112,7 +125,11 @@ end
 
 for name in names(Z3, all = true, imported = false)
     if __should_be_exported(name)
-        @eval export $name 
+        @eval export $name
+
+        # for m in methods(eval(name))
+        #     @eval $(__with_main_ctx(name, m))
+        # end
     end
 end
 
