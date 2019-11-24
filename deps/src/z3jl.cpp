@@ -326,7 +326,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .method("set", static_cast<void (params::*)(char const *, char const *)>(&params::set))
         .STRING(const params &);
     
-    m.add_type<param_descrs>("ParamDescrs", jlcxx::julia_type<object>());
+    m.add_type<param_descrs>("ParamDescrs", jlcxx::julia_type<object>())
+        .MM(param_descrs, size)
+        .MM(param_descrs, name)
+        .MM(param_descrs, documentation)
+        .method("string", &param_descrs::to_string);
+
     m.add_type<goal>("Goal", jlcxx::julia_type<object>());
     m.add_type<tactic>("Tactic", jlcxx::julia_type<object>());
     m.add_type<probe>("Probe", jlcxx::julia_type<object>());
