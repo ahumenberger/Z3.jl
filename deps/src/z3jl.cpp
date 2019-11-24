@@ -350,7 +350,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(goal, dimacs)
         .STRING(const goal &);
 
-    m.add_type<tactic>("Tactic", jlcxx::julia_type<object>());
+    m.add_type<tactic>("Tactic", jlcxx::julia_type<object>())
+        .constructor<context &, char const *>()
+        .method(&tactic::operator())
+        .MM(tactic, mk_solver)
+        .MM(tactic, apply)
+        .MM(tactic, help)
+        .MM(tactic, get_param_descrs);
+
     m.add_type<probe>("Probe", jlcxx::julia_type<object>());
     m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>());
     m.add_type<func_entry>("FuncEntry", jlcxx::julia_type<object>());
