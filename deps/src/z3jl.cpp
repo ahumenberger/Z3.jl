@@ -332,7 +332,24 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(param_descrs, documentation)
         .method("string", &param_descrs::to_string);
 
-    m.add_type<goal>("Goal", jlcxx::julia_type<object>());
+    m.add_type<goal>("Goal", jlcxx::julia_type<object>())
+        .method("add", static_cast<void (goal::*)(expr const &)>(&goal::add))
+        .method("add", static_cast<void (goal::*)(expr_vector const &)>(&goal::add))
+        .method("getindex", [](const goal &g, int i) { return g[i - 1]; })
+        .MM(goal, size)
+        // .MM(goal, precision)
+        .MM(goal, inconsistent)
+        .MM(goal, depth)
+        .MM(goal, reset)
+        .MM(goal, num_exprs)
+        .MM(goal, is_decided_sat)
+        .MM(goal, is_decided_unsat)
+        .MM(goal, convert_model)
+        .MM(goal, get_model)
+        .MM(goal, as_expr)
+        .MM(goal, dimacs)
+        .STRING(const goal &);
+
     m.add_type<tactic>("Tactic", jlcxx::julia_type<object>());
     m.add_type<probe>("Probe", jlcxx::julia_type<object>());
     m.add_type<func_interp>("FuncInterp", jlcxx::julia_type<object>());
