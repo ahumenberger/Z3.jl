@@ -313,7 +313,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         // .method("cubes", static_cast<cube_generator (solver::*)(expr_vector &)>(&solver::cubes))
         .STRING(const solver &);
 
-    m.add_type<symbol>("Symbol", jlcxx::julia_type<object>());
+    m.add_type<symbol>("Symbol", jlcxx::julia_type<object>())
+        .MM(symbol, to_int)
+        .method("string", &symbol::str);
+
     m.add_type<params>("Params", jlcxx::julia_type<object>());
     m.add_type<param_descrs>("ParamDescrs", jlcxx::julia_type<object>());
     m.add_type<goal>("Goal", jlcxx::julia_type<object>());
