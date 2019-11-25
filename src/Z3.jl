@@ -2,7 +2,8 @@ module Z3
 
 import Libdl
 using CxxWrap
-import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >
+import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >, xor, rem, mod, &, |, ~
+import Base: min, max, abs, sqrt
 import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
 import Base: Int, Rational

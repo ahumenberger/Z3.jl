@@ -224,22 +224,51 @@ JLCXX_MODULE define_julia_module(jlcxx::Module &m)
         .MM(expr, is_true);
 
     // Friends of expr
+    m.method("mk_or", &mk_or);
+    m.method("mk_and", &mk_and);
+    m.method("not", [](const expr &a) { return !a; });
+    EXPR_FNCALL(m, implies, implies, bool)
+    m.method("distinct", &distinct);
+    m.method("concat", static_cast<expr (*)(expr const &, expr const &)>(&concat));
+    m.method("concat", static_cast<expr (*)(expr_vector const &)>(&concat));
+
     EXPR_OPCALL(m, +, int)
     EXPR_OPCALL(m, -, int)
     m.method("-", [](const expr &a) { return -a; });
     EXPR_OPCALL(m, *, int)
     EXPR_OPCALL(m, /, int)
     EXPR_FNCALL(m, ^, pw, int)
-    m.method("mk_or", &mk_or);
-    m.method("mk_and", &mk_and);
-    m.method("not", [](const expr &a) { return !a; });
+    EXPR_FNCALL(m, mod, mod, int)
+    EXPR_FNCALL(m, rem, rem, int)
+
     EXPR_OPCALL(m, ==, int)
     EXPR_OPCALL(m, !=, int)
     EXPR_OPCALL(m, <=, int)
     EXPR_OPCALL(m, >=, int)
     EXPR_OPCALL(m, <, int)
     EXPR_OPCALL(m, >, int)
+
+    EXPR_OPCALL(m, &, int)
+    EXPR_OPCALL(m, |, int)
+    EXPR_NAMED_OPCALL(m, xor, ^, int)
+    m.method("~", [](const expr &a) { return ~a; });
+
     m.method("ite", &ite);
+    m.method("sum", &sum);
+    m.method("pble", &pble);
+    m.method("pbge", &pbge);
+    m.method("pbeq", &pbeq);
+    m.method("atmost", &atmost);
+    m.method("atleast", &atleast);
+    m.method("nand", &nand);
+    m.method("nor", &nor);
+    m.method("xnor", &xnor);
+    m.method("min", &min);
+    m.method("max", &max);
+    m.method("abs", static_cast<expr (*)(expr const &)>(&abs));
+    m.method("sqrt", static_cast<expr (*)(expr const &, expr const &)>(&sqrt));
+    m.method("fma", static_cast<expr (*)(expr const &, expr const &, expr const &, expr const &)>(&fma));
+    m.method("range", &range);
 
     m.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("AstVectorTpl")
         .apply<ast_vector_tpl<ast>, ast_vector_tpl<expr>, ast_vector_tpl<sort>, ast_vector_tpl<func_decl>>(
