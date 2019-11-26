@@ -24,6 +24,8 @@ run(`make`)
 
 JlCxx_dir = joinpath(dirname(dirname(CxxWrap.jlcxx_path)), "lib", "cmake", "JlCxx")
 
+CMAKE_FLAGS = `-DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$srcdir -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$srcdir`
+
 cd(srcdir)
-run(`$cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
+run(`$cmake -G "Unix Makefiles" $CMAKE_FLAGS -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
 run(`make`)
