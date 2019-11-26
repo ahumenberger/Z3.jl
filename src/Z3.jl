@@ -8,6 +8,10 @@ import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
 import Base: Int, Rational
 
+for (dir, _, files) in walkdir(realpath(joinpath(Base.@__DIR__, "..", "deps", "src")))
+    @show dir files
+end
+
 @wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
 
 function __init__()
