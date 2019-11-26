@@ -19,11 +19,11 @@ if !isdir(z3_builddir)
     mkdir(z3_builddir)
 end
 cd(z3_builddir)
-run(`$cmake $z3_dir`)
+run(`$cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release $z3_dir`)
 run(`make`)
 
 JlCxx_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
 
 cd(srcdir)
-run(`$cmake -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
+run(`$cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
 run(`make`)
