@@ -19,15 +19,15 @@ if !isdir(z3_builddir)
     mkdir(z3_builddir)
 end
 cd(z3_builddir)
-run(`$cmake $z3_dir`)
-run(`make`)
+if Sys.iswindows()
+    run(`$cmake -G"NMake Makefiles" $z3_dir`)
+    run(`nmake`)
+else
+    run(`$cmake $z3_dir`)
+    run(`make`)
+end
 
 JlCxx_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
-
-@info "" Sys.iswindows()
-if Sys.iswindows()
-    @info "" Sys.which("nmake")
-end
 
 cd(srcdir)
 if Sys.iswindows()
