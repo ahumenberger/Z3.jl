@@ -25,5 +25,10 @@ run(`make`)
 JlCxx_dir = joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx")
 
 cd(srcdir)
-run(`$cmake -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
-run(`make`)
+if Sys.iswindows()
+    run(`$cmake -G"NMake Makefiles" -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
+    run(`nmake`)
+else
+    run(`$cmake -DJlCxx_DIR=$JlCxx_dir -DZ3_DIR=$z3_builddir`)
+    run(`make`)
+end
