@@ -1,5 +1,8 @@
 project(Z3JL)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 find_package(JlCxx REQUIRED)
 find_package(Z3 REQUIRED CONFIG)
 
