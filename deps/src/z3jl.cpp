@@ -22,27 +22,30 @@ using namespace z3;
 
 #define MM(CLASS, FUNC) method(#FUNC, &CLASS::FUNC)
 
-template<> struct jlcxx::IsBits<check_result> : std::true_type {};
-template<> struct jlcxx::IsBits<rounding_mode> : std::true_type {};
-// template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
+namespace jlcxx
+{
+    template<> struct IsBits<check_result> : std::true_type {};
+    template<> struct IsBits<rounding_mode> : std::true_type {};
+    // template<> struct jlcxx::IsBits<Z3_error_code> : std::true_type {};
 
-template<> struct jlcxx::SuperType<solver>       { typedef object type; };
-template<> struct jlcxx::SuperType<goal>         { typedef object type; };
-template<> struct jlcxx::SuperType<apply_result> { typedef object type; };
-template<> struct jlcxx::SuperType<tactic>       { typedef object type; };
-template<> struct jlcxx::SuperType<probe>        { typedef object type; };
-template<> struct jlcxx::SuperType<optimize>     { typedef object type; };
-template<> struct jlcxx::SuperType<fixedpoint>   { typedef object type; };
-template<> struct jlcxx::SuperType<param_descrs> { typedef object type; };
-template<> struct jlcxx::SuperType<params>       { typedef object type; };
-template<> struct jlcxx::SuperType<ast>          { typedef object type; };
-template<> struct jlcxx::SuperType<func_entry>   { typedef object type; };
-template<> struct jlcxx::SuperType<func_interp>  { typedef object type; };
-template<> struct jlcxx::SuperType<model>        { typedef object type; };
-template<> struct jlcxx::SuperType<stats>        { typedef object type; };
-template<> struct jlcxx::SuperType<expr>         { typedef ast type; };
-template<> struct jlcxx::SuperType<sort>         { typedef ast type; };
-template<> struct jlcxx::SuperType<func_decl>    { typedef ast type; };
+    template<> struct SuperType<solver>       { typedef object type; };
+    template<> struct SuperType<goal>         { typedef object type; };
+    template<> struct SuperType<apply_result> { typedef object type; };
+    template<> struct SuperType<tactic>       { typedef object type; };
+    template<> struct SuperType<probe>        { typedef object type; };
+    template<> struct SuperType<optimize>     { typedef object type; };
+    template<> struct SuperType<fixedpoint>   { typedef object type; };
+    template<> struct SuperType<param_descrs> { typedef object type; };
+    template<> struct SuperType<params>       { typedef object type; };
+    template<> struct SuperType<ast>          { typedef object type; };
+    template<> struct SuperType<func_entry>   { typedef object type; };
+    template<> struct SuperType<func_interp>  { typedef object type; };
+    template<> struct SuperType<model>        { typedef object type; };
+    template<> struct SuperType<stats>        { typedef object type; };
+    template<> struct SuperType<expr>         { typedef ast type; };
+    template<> struct SuperType<sort>         { typedef ast type; };
+    template<> struct SuperType<func_decl>    { typedef ast type; };
+}
 
 JLCXX_MODULE define_context(jlcxx::TypeWrapper<context> &c)
 {
