@@ -3,13 +3,21 @@ using CMake
 using CxxWrap
 
 z3_url = "https://github.com/Z3Prover/z3"
-z3_version = "4.8.6"
+z3_version = "4.8.7"
 
 z3_dir = joinpath(pwd(), "z3")
 z3_builddir = joinpath(z3_dir, "build")
 srcdir = joinpath(pwd(), "src")
 
-if !isdir(z3_dir)
+if isdir(z3_dir)
+    repo = LibGit2.GitRepo(z3_dir)
+    LibGit2.fetch(repo)
+    hash_old = LibGit2.head_oid(repo)
+    hash_new = LibGit2.GitHash(repo, "refs/tags/z3-$z3_version")
+    if hash_old != hash_new
+        LibGit2.checkout!(repo, string(hash_new))
+    end
+else
     repo = LibGit2.clone(z3_url, z3_dir)
     hash = LibGit2.GitHash(repo, "refs/tags/z3-$z3_version")
     LibGit2.checkout!(repo, string(hash))
