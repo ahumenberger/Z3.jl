@@ -1,7 +1,7 @@
 name = "Z3"
 uuid = "06b161dc-0161-11ea-0f74-41f836f4024b"
 authors = ["Andreas Humenberger <ahumenberger@gmail.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 CMake = "631607c0-34d2-5d66-819e-eb0f9aa2061a"
