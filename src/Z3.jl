@@ -3,12 +3,13 @@ module Z3
 import Libdl
 using CxxWrap
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >, xor, rem, mod, &, |, ~
-import Base: min, max, abs, sqrt
+import Base: min, max, abs, sqrt, sum
 import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
 import Base: Int, Rational
 
-@wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
+# @wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
+@wrapmodule("/Users/ahumenberger/repo/z3/build/libz3jl.dylib")
 
 function __init__()
     @initcxx
@@ -63,6 +64,19 @@ function ExprVector(ctx::Context, xs)
     vec
 end
 
+Base.promote(x::S, y::T) where {S <: Expr, T <: Bool}                = (x, bool_val(ctx(x), y))
+Base.promote(x::S, y::T) where {S <: Expr, T <: Integer}             = (x, num_val(ctx(x), y, get_sort(x)))
+Base.promote(x::S, y::T) where {S <: Expr, T <: AbstractFloat}       = promote(x, rationalize(y))
+Base.promote(x::S, y::T) where {S <: Expr, T <: Rational{<:Integer}} = (x, real_val(ctx(x), numerator(y), denominator(y)))
+Base.promote(x::T, y::S) where {S <: Expr, T <: Number}              = promote(y, x)
+
+for op in [:+, :-, :*, :/, :^, :(==), :(!=), :(<=), :(>=), :(<), :(>), :&, :|, :xor]
+    @eval begin
+        $(op)(x::S, y::T) where {S <: Expr, T <: Number} = $(op)(promote(x, y)...)
+        $(op)(x::T, y::S) where {S <: Expr, T <: Number} = $(op)(promote(x, y)...)
+    end
+end
+
 # ------------------------------------------------------------------------------
 # Solver
 
@@ -75,14 +89,7 @@ eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_com
 
 # ------------------------------------------------------------------------------
 
-types_show = [
-    Ast,
-    AstVectorTpl,
-    Solver,
-    Model
-]
-
-for T in types_show
+for T in [Ast, AstVectorTpl, Solver, Model]
     Base.show(io::IO, x::T) = print(io, string(x))
 end
 
