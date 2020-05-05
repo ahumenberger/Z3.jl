@@ -6,7 +6,6 @@ import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >, xor, rem, mod, &, |, ~
 import Base: min, max, abs, sqrt, sum
 import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
-import Base: Int, Rational
 
 # @wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
 @wrapmodule("/Users/ahumenberger/repo/z3/build/libz3jl.dylib")
@@ -39,24 +38,24 @@ Base.length(m::Model) = size(m)
 # ------------------------------------------------------------------------------
 # Expr
 
-function Int(x::Expr)
-    @assert is_int(x)
-    get_numeral_int(x)
-end
-Rational{Int}(x::Expr) = Int(numerator(x)) // Int(denominator(x))
-
 or(xs::ExprVector) = mk_or(xs)
-or(xs) = or(ExprVector(ctx(first(xs)), xs))
+function or(xs::Union{AbstractArray, Tuple})
+    @assert length(xs) > 1
+    or(ExprVector(ctx(first(xs)), xs))
+end
 or(xs...) = or(xs)
 
 and(xs::ExprVector) = mk_and(xs)
-and(xs) = and(ExprVector(ctx(first(xs)), xs))
+function and(xs::Union{AbstractArray, Tuple})
+    @assert length(xs) > 1
+    and(ExprVector(ctx(first(xs)), xs))
+end
 and(xs...) = and(xs)
 
 # ------------------------------------------------------------------------------
 # ExprVector
 
-function ExprVector(ctx::Context, xs)
+CxxWrap.@cxxdereference function ExprVector(ctx::Context, xs)
     vec = ExprVector(ctx)
     for x in xs
         push!(vec, x)
@@ -89,7 +88,7 @@ eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_com
 
 # ------------------------------------------------------------------------------
 
-for T in [Ast, AstVectorTpl, Solver, Model]
+for T in [Ast, AstVectorTpl, Solver, Model, Symbol, Fixedpoint, Optimize, Params, ParamDescrs, Goal]
     Base.show(io::IO, x::T) = print(io, string(x))
 end
 
