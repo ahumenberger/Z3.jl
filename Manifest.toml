@@ -74,3 +74,9 @@ deps = ["Libdl", "Pkg"]
 git-tree-sha1 = "0a7089c9ccc348b4433689992046eb53837657ac"
 uuid = "3eaa8342-bff7-56a5-9981-c04077f7cee7"
 version = "0.7.0+0"
+
+[[z3_jll]]
+deps = ["Libdl", "Pkg", "libcxxwrap_julia_jll"]
+git-tree-sha1 = "c48851566b94f45e6c2058ac26a9c2fe5b1cf1bc"
+uuid = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
+version = "4.8.8+0"

@@ -1,14 +1,18 @@
 module Z3
 
 using CxxWrap
+using z3_jll
 
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >, xor, rem, mod, &, |, ~
 import Base: min, max, abs, sqrt, sum
 import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
 
-# @wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
-@wrapmodule("/Users/ahumenberger/repo/z3/build/libz3jl.dylib")
+if !isdefined(z3_jll, :libz3jl)
+    error("Platform not supported")
+end
+
+@wrapmodule(z3_jll.libz3jl)
 
 function __init__()
     @initcxx
