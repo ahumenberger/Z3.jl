@@ -26,3 +26,5 @@ end
 ## C++ API vs. Julia API
 
 This package wraps the [C++ API](https://z3prover.github.io/api/html/namespacez3.html) of Z3. As such Z3's types are available in Julia by using its camel case name variant, e.g. `z3::func_entry` is available as `FuncEntry`. Furthermore, member functions are called with the object as its first argument, that is, `real_const(ctx, "x")` would be the Julia equivalent of `ctx.real_const("x")` for an object `ctx` of type `Context`.
+
+See [z3jl.cpp](https://github.com/Z3Prover/z3/blob/master/src/api/julia/z3jl.cpp) for an exact list of exposed types and methods.
