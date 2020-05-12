@@ -4,8 +4,6 @@
 
 This package provides an interface to the [Z3 Theorem Prover](https://github.com/Z3Prover/z3) by wrapping the [C++ API](https://z3prover.github.io/api/html/namespacez3.html) of Z3 using [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl).
 
-There are still a few parts of the API missing. Feel free to contribute!
-
 ```julia
 ctx = Context()
 x = real_const(ctx, "x")
@@ -20,7 +18,11 @@ res = check(s)
 
 m = get_model(s)
 
-for (k,v) in consts(m)
+for (k, v) in consts(m)
     println("$k = $v")
 end
 ```
+
+## C++ API vs. Julia API
+
+This package wraps the [C++ API](https://z3prover.github.io/api/html/namespacez3.html) of Z3. As such Z3's types are available in Julia by using its camel case name variant, e.g. `z3::func_entry` is available as `FuncEntry`. Furthermore, member functions are called with the object as its first argument, that is, `real_const(ctx, "x")` would be the Julia equivalent of `ctx.real_const("x")` for an object `ctx` of type `Context`.

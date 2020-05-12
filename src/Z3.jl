@@ -1,14 +1,18 @@
 module Z3
 
-import Libdl
 using CxxWrap
+using z3_jll
+
 import Base: +, -, *, /, ^, ==, !=, !, <=, >=, <, >, xor, rem, mod, &, |, ~
-import Base: min, max, abs, sqrt
+import Base: min, max, abs, sqrt, sum
 import Base: string, getindex, size, length, push!, isequal, hash
 import Base: numerator, denominator
-import Base: Int, Rational
 
-@wrapmodule(realpath(joinpath(Base.@__DIR__, "..", "deps", "src", "libz3jl." * Libdl.dlext)))
+if !isdefined(z3_jll, :libz3jl)
+    error("Platform not supported")
+end
+
+@wrapmodule(z3_jll.libz3jl)
 
 function __init__()
     @initcxx
@@ -38,29 +42,42 @@ Base.length(m::Model) = size(m)
 # ------------------------------------------------------------------------------
 # Expr
 
-function Int(x::Expr)
-    @assert is_int(x)
-    get_numeral_int(x)
-end
-Rational{Int}(x::Expr) = Int(numerator(x)) // Int(denominator(x))
-
 or(xs::ExprVector) = mk_or(xs)
-or(xs) = or(ExprVector(ctx(first(xs)), xs))
+function or(xs::Union{AbstractArray, Tuple})
+    @assert length(xs) > 1
+    or(ExprVector(ctx(first(xs)), xs))
+end
 or(xs...) = or(xs)
 
 and(xs::ExprVector) = mk_and(xs)
-and(xs) = and(ExprVector(ctx(first(xs)), xs))
+function and(xs::Union{AbstractArray, Tuple})
+    @assert length(xs) > 1
+    and(ExprVector(ctx(first(xs)), xs))
+end
 and(xs...) = and(xs)
 
 # ------------------------------------------------------------------------------
 # ExprVector
 
-function ExprVector(ctx::Context, xs)
+CxxWrap.@cxxdereference function ExprVector(ctx::Context, xs)
     vec = ExprVector(ctx)
     for x in xs
         push!(vec, x)
     end
     vec
+end
+
+Base.promote(x::S, y::T) where {S <: Expr, T <: Bool}                = (x, bool_val(ctx(x), y))
+Base.promote(x::S, y::T) where {S <: Expr, T <: Integer}             = (x, num_val(ctx(x), y, get_sort(x)))
+Base.promote(x::S, y::T) where {S <: Expr, T <: AbstractFloat}       = promote(x, rationalize(y))
+Base.promote(x::S, y::T) where {S <: Expr, T <: Rational{<:Integer}} = (x, real_val(ctx(x), numerator(y), denominator(y)))
+Base.promote(x::T, y::S) where {S <: Expr, T <: Number}              = promote(y, x)
+
+for op in [:+, :-, :*, :/, :^, :(==), :(!=), :(<=), :(>=), :(<), :(>), :&, :|, :xor]
+    @eval begin
+        $(op)(x::S, y::T) where {S <: Expr, T <: Number} = $(op)(promote(x, y)...)
+        $(op)(x::T, y::S) where {S <: Expr, T <: Number} = $(op)(promote(x, y)...)
+    end
 end
 
 # ------------------------------------------------------------------------------
@@ -75,14 +92,7 @@ eval(m::Model, e::Expr, model_completion::Bool = false) = __eval(m, e, model_com
 
 # ------------------------------------------------------------------------------
 
-types_show = [
-    Ast,
-    AstVectorTpl,
-    Solver,
-    Model
-]
-
-for T in types_show
+for T in [Ast, AstVectorTpl, Solver, Model, Symbol, Fixedpoint, Optimize, Params, ParamDescrs, Goal]
     Base.show(io::IO, x::T) = print(io, string(x))
 end
 
