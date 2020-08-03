@@ -71,7 +71,7 @@ Base.promote(x::S, y::T) where {S <: Expr, T <: Bool}                = (x, bool_
 Base.promote(x::S, y::T) where {S <: Expr, T <: Integer}             = (x, num_val(ctx(x), y, get_sort(x)))
 Base.promote(x::S, y::T) where {S <: Expr, T <: AbstractFloat}       = promote(x, rationalize(y))
 Base.promote(x::S, y::T) where {S <: Expr, T <: Rational{<:Integer}} = (x, real_val(ctx(x), numerator(y), denominator(y)))
-Base.promote(x::T, y::S) where {S <: Expr, T <: Number}              = promote(y, x)
+Base.promote(x::T, y::S) where {S <: Expr, T <: Number}              = reverse(promote(y, x))
 
 for op in [:+, :-, :*, :/, :^, :(==), :(!=), :(<=), :(>=), :(<), :(>), :&, :|, :xor]
     @eval begin

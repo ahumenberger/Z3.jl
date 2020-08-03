@@ -1,7 +1,7 @@
 name = "Z3"
 uuid = "06b161dc-0161-11ea-0f74-41f836f4024b"
 authors = ["Andreas Humenberger <ahumenberger@gmail.com>"]
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
