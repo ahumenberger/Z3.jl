@@ -80,6 +80,11 @@ for op in [:+, :-, :*, :/, :^, :(==), :(!=), :(<=), :(>=), :(<), :(>), :&, :|, :
     end
 end
 
+substitute(ctx::Context, expr::E1, substs::AbstractVector{Tuple{E2,E2}}) where {E1 <: Expr, E2 <: Expr} = begin
+    a, b = zip(substs...)
+    substitute(expr, ExprVector(ctx, a), ExprVector(ctx, b))
+end
+
 # ------------------------------------------------------------------------------
 # Solver
 
