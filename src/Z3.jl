@@ -12,7 +12,7 @@ if !isdefined(z3_jll, :libz3jl)
     error("Platform not supported")
 end
 
-@wrapmodule(z3_jll.libz3jl)
+@wrapmodule(z3_jll.get_libz3jl_path)
 
 function __init__()
     @initcxx
@@ -63,6 +63,17 @@ CxxWrap.@cxxdereference function ExprVector(ctx::Context, xs)
     vec = ExprVector(ctx)
     for x in xs
         push!(vec, x)
+    end
+    vec
+end
+
+# ------------------------------------------------------------------------------
+# SortVector
+
+CxxWrap.@cxxdereference function SortVector(ctx::Context, ss)
+    vec = SortVector(ctx)
+    for s in ss
+        push!(vec, s)
     end
     vec
 end
