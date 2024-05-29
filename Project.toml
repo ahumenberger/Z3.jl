@@ -1,19 +1,19 @@
 name = "Z3"
 uuid = "06b161dc-0161-11ea-0f74-41f836f4024b"
 authors = ["Andreas Humenberger <ahumenberger@gmail.com>"]
-version = "0.4.4"
+version = "1.0.0"
 
 [deps]
-CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
 z3_jll = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
 
 [compat]
-CxxWrap = "0.15.0"
+CEnum = "0.5.0"
 julia = "1.6"
 z3_jll = "4.13.0"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
 
 [targets]
-test = ["Test"]
+test = ["ReTestItems"]
