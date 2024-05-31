@@ -28,9 +28,9 @@ function Context()
     cfg = Z3_mk_config()
     Z3_set_param_value(cfg, "debug_ref_count", "true")
     ctx = Z3_mk_context_rc(cfg)
+    Z3_del_config(cfg)
     Z3_enable_concurrent_dec_ref(ctx)
     c = Context(ctx)
-    Z3_del_config(cfg)
     return c
 end
 
