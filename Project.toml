@@ -10,7 +10,6 @@ z3_jll = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
 [compat]
 CEnum = "0.5.0"
 julia = "1.6"
-z3_jll = "4.13.0"
 
 [extras]
 ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"

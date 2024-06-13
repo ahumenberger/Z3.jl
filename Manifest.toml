@@ -2,7 +2,7 @@
 
 julia_version = "1.10.2"
 manifest_format = "2.0"
-project_hash = "14b75dad56524e3f944ed54bc1b89c3d3937a1cd"
+project_hash = "eb119fd0620668af2280075c032d6052a8815f06"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -55,12 +55,12 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.libcxxwrap_julia_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "0f10092db771939e29fd13a67967f5c63212fdfe"
+git-tree-sha1 = "a2f8e265eff70b2ed1d45fad8995b227513e3f08"
 uuid = "3eaa8342-bff7-56a5-9981-c04077f7cee7"
-version = "0.12.3+0"
+version = "0.13.1+0"
 
 [[deps.z3_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "GMP_jll", "JLLWrappers", "Libdl", "libcxxwrap_julia_jll"]
-git-tree-sha1 = "94c97c83e0221ac868b46dc88052f5f8bc7b2cea"
+git-tree-sha1 = "20316fef306bb590325659b4bb40869fed8ba2bd"
 uuid = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
-version = "4.13.0+1"
+version = "4.13.0+2"
