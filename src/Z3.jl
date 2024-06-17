@@ -5,7 +5,7 @@ using .Libz3
 import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val, 
-Const, IntVar, FP, FuncDecl, And, Or, Not, Exists, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Sort,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -208,6 +208,11 @@ Base.isless(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_lt(ctx_ref(a), as_ast(a), as_a
 function IntVar(name::String, ctx=nothing)
     ctx = _get_ctx(ctx)
     return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), IntSort(ctx).ast))
+end
+
+function BoolVar(name::String, ctx=nothing)
+    ctx = _get_ctx(ctx)
+    return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), BoolSort(ctx).ast))
 end
 
 function Const(name::String, sort::Sort)
