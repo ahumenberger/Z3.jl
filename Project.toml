@@ -5,6 +5,7 @@ version = "1.0.2"
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
 z3_jll = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
 
 [compat]
