@@ -254,6 +254,11 @@ function BoolVar(name::String, ctx=nothing)
     return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), BoolSort(ctx).ast))
 end
 
+function BitVecVar(name::String, sz::Integer, ctx=nothing)
+    ctx = _get_ctx(ctx)
+    return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), BitVecSort(sz, ctx).ast))
+end
+
 function Const(name::String, sort::Sort)
     return Expr(sort.ctx, Z3_mk_const(ctx_ref(sort), to_symbol(name, sort.ctx), sort.ast))
 end
