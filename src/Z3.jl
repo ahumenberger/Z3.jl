@@ -273,7 +273,7 @@ function Or(args::Vector{Expr})
     return Expr(ctx, Z3_mk_or(ref(ctx), length(args), map(e -> as_ast(e), args)))
 end
 
-function xor(a::Vector{Expr}, b::Vector{Expr})
+function xor(a::Expr, b::Expr)
     ctx = a.ctx
     args = [a, b]
     return Expr(ctx, Z3_mk_xor(ref(ctx), length(args), map(e -> as_ast(e), args)))
