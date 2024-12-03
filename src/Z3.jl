@@ -5,7 +5,7 @@ using .Libz3
 import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
-Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Forall, Sort, xor,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -254,6 +254,11 @@ function BoolVar(name::String, ctx=nothing)
     return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), BoolSort(ctx).ast))
 end
 
+function BitVecVar(name::String, sz::Integer, ctx=nothing)
+    ctx = _get_ctx(ctx)
+    return Expr(ctx, Z3_mk_const(ref(ctx), to_symbol(name, ctx), BitVecSort(sz, ctx).ast))
+end
+
 function Const(name::String, sort::Sort)
     return Expr(sort.ctx, Z3_mk_const(ctx_ref(sort), to_symbol(name, sort.ctx), sort.ast))
 end
@@ -268,6 +273,12 @@ function Or(args::Vector{Expr})
     return Expr(ctx, Z3_mk_or(ref(ctx), length(args), map(e -> as_ast(e), args)))
 end
 
+function xor(a::Expr, b::Expr)
+    ctx = a.ctx
+    args = [a, b]
+    return Expr(ctx, Z3_mk_xor(ref(ctx), length(args), map(e -> as_ast(e), args)))
+end
+
 function Not(a::Expr)
     ctx = a.ctx
     return Expr(ctx, Z3_mk_not(ref(ctx), as_ast(a)))
@@ -276,6 +287,11 @@ end
 function Exists(vars::Vector{Expr}, body::Expr)
     ctx = body.ctx
     return Expr(ctx, Z3_mk_exists_const(ref(ctx), 0, length(vars), map(e -> as_ast(e), vars), 0, [], as_ast(body)))
+end
+
+function Forall(vars::Vector{Expr}, body::Expr)
+    ctx = body.ctx
+    return Expr(ctx, Z3_mk_forall_const(ref(ctx), 0, length(vars), map(e -> as_ast(e), vars), 0, [], as_ast(body)))
 end
 
 #--------#
