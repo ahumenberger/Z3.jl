@@ -5,7 +5,7 @@ using .Libz3
 import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
-Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Forall, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Forall, Sort, xor,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -271,6 +271,12 @@ end
 function Or(args::Vector{Expr})
     ctx = args[1].ctx
     return Expr(ctx, Z3_mk_or(ref(ctx), length(args), map(e -> as_ast(e), args)))
+end
+
+function xor(a::Vector{Expr}, b::Vector{Expr})
+    ctx = a.ctx
+    args = [a, b]
+    return Expr(ctx, Z3_mk_xor(ref(ctx), length(args), map(e -> as_ast(e), args)))
 end
 
 function Not(a::Expr)
