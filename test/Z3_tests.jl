@@ -153,3 +153,51 @@ end
     s2 = IntSort(c)
     @test !(s1 === s2)
 end
+
+@testitem "If with constants: true" begin
+    x = BoolVal(true)
+    y = BoolVal(false)
+    z = BoolVal(true)
+    a = If(x, y, z)
+    @test "$a" == "(ite true false true)"
+end
+
+@testitem "If with condition: false" begin
+    x = BoolVal(false)
+    y = BoolVal(false)
+    z = BoolVal(true)
+    a = If(x, y, z)
+    @test "$a" == "(ite false false true)"
+end
+
+@testitem "If with symbolic booleans" begin
+    x = BoolVar("x")
+    y = BoolVar("y")
+    z = BoolVar("z")
+    a = If(x, y, z)
+    @test "$a" == "(ite x y z)"
+end
+
+@testitem "Nested If" begin
+    x = BoolVal(true)
+    y = BoolVal(false)
+    z = BoolVal(true)
+    w = BoolVal(false)
+    a = If(x, If(y, z, w), z)
+    @test "$a" == "(ite true (ite false true false) true)"
+end
+
+@testitem "If with logical operations" begin
+    x = BoolVar("x")
+    y = BoolVar("y")
+    z = BoolVar("z")
+    a = If(x, And([y, z]), Or([y, z]))
+    @test "$a" == "(ite x (and y z) (or y z))"
+end
+
+@testitem "If with contradictory branches" begin
+    x = BoolVar("x")
+    y = BoolVar("y")
+    a = If(x, y, Not(y))
+    @test "$a" == "(ite x y (not y))"
+end
