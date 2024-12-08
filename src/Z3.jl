@@ -5,7 +5,7 @@ using .Libz3
 import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
-Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Iff, Exists, Sort,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -276,6 +276,11 @@ end
 function Exists(vars::Vector{Expr}, body::Expr)
     ctx = body.ctx
     return Expr(ctx, Z3_mk_exists_const(ref(ctx), 0, length(vars), map(e -> as_ast(e), vars), 0, [], as_ast(body)))
+end
+
+function Iff(t1::Expr, t2::Expr)
+    ctx = t1.ctx
+    return Expr(ctx, Z3_mk_iff(ref(ctx), as_ast(t1), as_ast(t2)))
 end
 
 #--------#
