@@ -153,3 +153,17 @@ end
     s2 = IntSort(c)
     @test !(s1 === s2)
 end
+
+@testitem "Iff with symbolic booleans" begin
+    x = BoolVar("x")
+    y = BoolVar("y")
+    a = Iff(x, y)
+    @test "$a" == "(= x y)"
+end
+
+@testitem "Iff with constants" begin
+    x = BoolVal(true)
+    y = BoolVal(false)
+    a = Iff(x, y)
+    @test "$a" == "(= true false)"
+end
