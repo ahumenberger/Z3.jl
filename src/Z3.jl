@@ -6,6 +6,7 @@ import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
 Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, If, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Exists, Sort,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -281,6 +282,11 @@ end
 function If(cond::Expr, then_branch::Expr, else_branch::Expr)
     ctx = cond.ctx
     return Expr(ctx, Z3_mk_ite(ref(ctx), as_ast(cond), as_ast(then_branch), as_ast(else_branch)))
+end
+
+function Iff(t1::Expr, t2::Expr)
+    ctx = t1.ctx
+    return Expr(ctx, Z3_mk_iff(ref(ctx), as_ast(t1), as_ast(t2)))
 end
 
 #--------#

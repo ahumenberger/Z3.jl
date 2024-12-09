@@ -201,3 +201,17 @@ end
     a = If(x, y, Not(y))
     @test "$a" == "(ite x y (not y))"
 end
+
+@testitem "Iff with symbolic booleans" begin
+    x = BoolVar("x")
+    y = BoolVar("y")
+    a = Iff(x, y)
+    @test "$a" == "(= x y)"
+end
+
+@testitem "Iff with constants" begin
+    x = BoolVal(true)
+    y = BoolVal(false)
+    a = Iff(x, y)
+    @test "$a" == "(= true false)"
+end
