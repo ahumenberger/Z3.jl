@@ -5,7 +5,6 @@ using .Libz3
 import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
-Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, Exists, If, Sort,
 Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Exists, Sort,
 Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
 
