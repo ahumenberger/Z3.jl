@@ -6,7 +6,7 @@ import Base: ==, isless
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
 Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Exists, Sort,
-Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertions
+Context, Solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
 # Context #
@@ -14,32 +14,25 @@ Context, Solver, del_solver, add, push, pop, check, CheckResult, model, assertio
 
 mutable struct Context
     ctx::Z3_context
-    finalized::Bool
-    lock::ReentrantLock
-    function Context(ctx::Z3_context, finalized=false, lock=ReentrantLock())
-        c = new(ctx, false, ReentrantLock())
+    rc::Threads.Atomic{Int}
+    function Context(ctx::Z3_context, rc=Threads.Atomic{Int}(0))
+        c = new(ctx, rc)
         finalizer(finalize_ctx, c)
     end
 end
 
 function finalize_ctx(c)
-    if islocked(c.lock) || !trylock(c.lock)
+    if c.rc[] > 0
         finalizer(finalize_ctx, c)
-        return nothing
-    end
-    try
-        c.finalized = true
+    else
         Z3_del_context(c.ctx)
-    finally
-        unlock(c.lock)
     end
 end
 
 function Context()
     cfg = Z3_mk_config()
-    ctx = Z3_mk_context_rc(cfg)
+    ctx = Z3_mk_context(cfg)
     Z3_del_config(cfg)
-    Z3_enable_concurrent_dec_ref(ctx)
     c = Context(ctx)
     return c
 end
@@ -77,28 +70,9 @@ Base.show(io::IO, x::AST) = print(io, unsafe_string(Z3_ast_to_string(ctx_ref(x),
 # Sorts #
 #-------#
 
-mutable struct Sort <: AST
+struct Sort <: AST
     ctx::Context
     ast::Z3_sort
-    function Sort(ctx::Context, ast::Z3_sort)
-        s = new(ctx, ast)
-        Z3_inc_ref(ctx_ref(s), s.ast)
-        finalizer(finalize_sort, s)
-    end
-end
-
-function finalize_sort(s)
-    if !s.ctx.finalized
-        if islocked(s.ctx.lock) || !trylock(s.ctx.lock)
-            finalizer(finalize_sort, s)
-            return nothing
-        end
-        try
-            Z3_dec_ref(s.ctx.ctx, s.ast)
-        finally
-            unlock(s.ctx.lock)
-        end
-    end
 end
 
 as_ast(s::Sort) = Z3_sort_to_ast(ctx_ref(s), s.ast)
@@ -144,28 +118,9 @@ end
 #--------------#
 # Declarations #
 #--------------#
-mutable struct FuncDecl <: AST
+struct FuncDecl <: AST
     ctx::Context
     decl::Z3_func_decl
-    function FuncDecl(ctx::Context, decl::Z3_func_decl)
-        f = new(ctx, decl)
-        Z3_inc_ref(ctx_ref(f), f.decl)
-        finalizer(finalize_func_decl, f)
-    end
-end
-
-function finalize_func_decl(f)
-    if !f.ctx.finalized
-        if islocked(f.ctx.lock) || !trylock(f.ctx.lock)
-            finalizer(finalize_func_decl, f)
-            return nothing
-        end
-        try
-            Z3_dec_ref(f.ctx.ctx, f.decl)
-        finally
-            unlock(f.ctx.lock)
-        end
-    end
 end
 
 as_ast(f::FuncDecl) = Z3_func_decl_to_ast(ctx_ref(f), f.decl)
@@ -185,28 +140,9 @@ end
 # Expressions #
 #-------------#
 
-mutable struct Expr <: AST
+struct Expr <: AST
     ctx::Context
     expr::Z3_ast
-    function Expr(ctx::Context, expr::Z3_ast)
-        e = new(ctx, expr)
-        Z3_inc_ref(ctx_ref(e), e.expr)
-        finalizer(finalize_expr, e)
-    end
-end
-
-function finalize_expr(e)
-    if !e.ctx.finalized
-        if islocked(e.ctx.lock) || !trylock(e.ctx.lock)
-            finalizer(finalize_expr, e)
-            return nothing
-        end
-        try
-            Z3_dec_ref(e.ctx.ctx, e.expr)
-        finally
-            unlock(e.ctx.lock)
-        end
-    end
 end
 
 as_ast(e::Expr) = e.expr
@@ -296,6 +232,7 @@ mutable struct Solver
     ctx::Context
     solver::Z3_solver
     function Solver(ctx::Context, solver::Z3_solver)
+        Threads.atomic_add!(ctx.rc, 1)
         s = new(ctx, solver)
         Z3_solver_inc_ref(ctx_ref(s), s.solver)
         finalizer(finalize_solver, s)
@@ -303,24 +240,15 @@ mutable struct Solver
 end
 
 function finalize_solver(s)
-    if !s.ctx.finalized
-        if islocked(s.ctx.lock) || !trylock(s.ctx.lock)
-            finalizer(finalize_solver, s)
-            return nothing
-        end
-        try
-            Z3_solver_dec_ref(s.ctx.ctx, s.solver)
-        finally
-            unlock(s.ctx.lock)
-        end
-    end
+    Z3_solver_dec_ref(s.ctx.ctx, s.solver)
+    Threads.atomic_sub!(s.ctx.rc, 1)
 end
 
 ctx_ref(s::Solver) = ref(s.ctx)
 
 function Solver(ctx=nothing)
     ctx = _get_ctx(ctx)
-    s = Solver(ctx, Z3_mk_solver(ref(ctx)))
+    Solver(ctx, Z3_mk_solver(ref(ctx)))
 end
 
 function add(s::Solver, e::Expr)
@@ -340,6 +268,7 @@ mutable struct Model
     model::Z3_model
 
     function Model(ctx::Context, model::Z3_model)
+        Threads.atomic_add!(ctx.rc, 1)
         m = new(ctx, model)
         Z3_model_inc_ref(ctx_ref(m), m.model)
         finalizer(finalize_model, m)
@@ -347,17 +276,8 @@ mutable struct Model
 end
 
 function finalize_model(m)
-    if !m.ctx.finalized
-        if islocked(m.ctx.lock) || !trylock(m.ctx.lock)
-            finalizer(finalize_model, m)
-            return nothing
-        end
-        try
-            Z3_model_dec_ref(m.ctx.ctx, m.model)
-        finally
-            unlock(m.ctx.lock)
-        end
-    end
+    Z3_model_dec_ref(m.ctx.ctx, m.model)
+    Threads.atomic_sub!(m.ctx.rc, 1)
 end
 
 model(s::Solver) = Model(s.ctx, Z3_solver_get_model(ctx_ref(s), s.solver))

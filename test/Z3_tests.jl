@@ -147,13 +147,6 @@ end
     @test "$(assertions(s))" == "(ast-vector\n  (< x y))"
 end
 
-@testitem "make same sort twice" begin
-    c = Context()
-    s1 = IntSort(c)
-    s2 = IntSort(c)
-    @test !(s1 === s2)
-end
-
 @testitem "If with constants: true" begin
     x = BoolVal(true)
     y = BoolVal(false)
