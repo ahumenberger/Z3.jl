@@ -188,6 +188,12 @@ end
     @test "$a" == "(ite x (and y z) (or y z))"
 end
 
+@testitem "make same sort twice" begin
+    s1 = IntSort()
+    s2 = IntSort()
+    @test s1 === s2
+end
+
 @testitem "If with contradictory branches" begin
     x = BoolVar("x")
     y = BoolVar("y")
