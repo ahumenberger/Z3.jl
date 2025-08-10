@@ -2,7 +2,8 @@ module Z3
 
 include("libz3.jl")
 using .Libz3
-import Base: ==, isless
+import Base: ==, <, <=, >, >=
+import Base: +, *, -, /, ^
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
 Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Exists, Sort,
@@ -178,7 +179,16 @@ function FP(name::String, fpsort::Sort)
 end
 
 (==)(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_eq(ctx_ref(a), as_ast(a), as_ast(b)))
-Base.isless(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_lt(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:<(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_lt(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:<=(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_le(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:>(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_gt(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:>=(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_ge(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:+(args::Vararg{Expr}) = Expr(args[1].ctx, Z3_mk_add(ctx_ref(args[1]), length(args), map(as_ast, collect(args))))
+Base.:*(args::Vararg{Expr}) = Expr(args[1].ctx, Z3_mk_mul(ctx_ref(args[1]), length(args), map(as_ast, collect(args))))
+Base.:-(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_sub(ctx_ref(a), 2, map(as_ast, [a, b])))
+Base.:-(a::Expr) = Expr(a.ctx, Z3_mk_unary_minus(ctx_ref(a), as_ast(a)))
+Base.:/(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_div(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:^(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_power(ctx_ref(a), as_ast(a), as_ast(b)))
 
 function IntVar(name::String, ctx=nothing)
     ctx = _get_ctx(ctx)
