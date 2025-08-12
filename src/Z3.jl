@@ -2,7 +2,7 @@ module Z3
 
 include("libz3.jl")
 using .Libz3
-import Base: ==, <, <=, >, >=
+import Base: ==, !=, <, <=, >, >=
 import Base: +, *, -, /, ^
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
