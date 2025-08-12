@@ -189,6 +189,7 @@ Base.:-(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_sub(ctx_ref(a), 2, map(as_ast, [a,
 Base.:-(a::Expr) = Expr(a.ctx, Z3_mk_unary_minus(ctx_ref(a), as_ast(a)))
 Base.:/(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_div(ctx_ref(a), as_ast(a), as_ast(b)))
 Base.:^(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_power(ctx_ref(a), as_ast(a), as_ast(b)))
+Base.:!=(a::Expr, b::Expr) = Expr(a.ctx, Z3_mk_distinct(ctx_ref(a), as_ast(a), as_ast(b)))
 
 function IntVar(name::String, ctx=nothing)
     ctx = _get_ctx(ctx)
