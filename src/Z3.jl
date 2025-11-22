@@ -6,7 +6,7 @@ import Base: ==, !=, <, <=, >, >=
 import Base: +, *, -, /, ^
 export init_ctx, clear_ctx, Sort, DeclareSort, BoolSort, IntSort, BitVecSort, Float16Sort, Float32Sort, Float64Sort,
 BoolVal, IntVal, BitVecVal, Float32Val, Float64Val,
-Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Exists, Sort,
+Const, IntVar, BoolVar, FP, FuncDecl, And, Or, Not, If, Iff, Implies, Exists, Sort,
 Context, Solver, add, push, pop, check, CheckResult, model, assertions
 
 #---------#
@@ -232,6 +232,10 @@ end
 function Iff(t1::Expr, t2::Expr)
     ctx = t1.ctx
     return Expr(ctx, Z3_mk_iff(ref(ctx), as_ast(t1), as_ast(t2)))
+end
+function Implies(t1::Expr, t2::Expr)
+    ctx = t1.ctx
+    return Expr(ctx, Z3_mk_implies(ref(ctx), as_ast(t1), as_ast(t2)))
 end
 
 #--------#
